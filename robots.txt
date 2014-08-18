@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow: /page/default/layout/
+Disallow: /lib/
+Disallow: /application/
+
