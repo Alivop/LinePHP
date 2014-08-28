@@ -24,7 +24,7 @@
 namespace line\core\template;
 
 use line\core\LinePHP;
-use line\core\exception\ExpressionException;
+use line\core\template\exception\ExpressionException;
 use line\core\Config;
 use line\core\util\Math;
 use line\core\util\StringUtil;
@@ -58,7 +58,7 @@ class Expression extends LinePHP
     }
 
     /**
-     * 字符串用+连接
+     * 
      * @return boolean
      */
     public function parse()
@@ -71,12 +71,14 @@ class Expression extends LinePHP
         } elseif (strcasecmp($expression, 'false') == 0) {
             return false;
         }
-        if (self::check($expression)&&$this->varCount>1) {
+        if (self::check($expression) && $this->varCount > 1) {
             if (preg_match("/!|&&|\|\|/", $expression)) {
                 return $this->parseLogic($expression);
             } else {
                 return $this->parseArithmetic($expression);
             }
+        } elseif (strpos('!', $expression) == 0 && $this->varCount <= 1) {
+            return $this->parseLogic($expression);
         }
         return str_replace("+", "", $expression);
     }
@@ -94,7 +96,7 @@ class Expression extends LinePHP
     private function transform($page, $map)
     {
         $count = &$this->varCount;
-        $expression = preg_replace_callback('/[\w.]+/', function($matche) use ($page, $map,&$count) {
+        $expression = preg_replace_callback('/[\w_.]+/', function($matche) use ($page, $map, &$count) {
             if (isset($matche[0])) {
                 $count++;
                 $var = $matche[0];

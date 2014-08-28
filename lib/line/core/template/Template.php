@@ -26,7 +26,7 @@ namespace line\core\template;
 use line\core\LinePHP;
 use line\core\Config;
 use line\core\template\Expression;
-use line\core\exception\TemplateException;
+use line\core\template\exception\TemplateException;
 
 /**
  * The template class
@@ -42,29 +42,39 @@ class Template extends LinePHP
     private $content;
     private $data;
     private $description;
-    const ID = "LP_TEMPLATE_TEMP_ID";
+    private $domcument;
 
     public function __construct($content = null, $data = null, $description = '')
     {
         $this->content = $content;
         $this->data = $data;
         $this->description = $description;
+        $this->domcument = null;
     }
 
     public function parse()
     {
         if (!isset($this->content)) {
-            throw new TemplateException($this->description . ':' . Config::$LP_LANG['empty_template'],500);
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['empty_template'], 500);
         }
+        $content = $this->parseConstant($this->content);
         if (isset($this->data)) {
-            $content = $this->parseComment($this->content);
+            $content = $this->parseComment($content);
             $content = $this->parseNote($content);
-            $content = $this->parseExpression($content, $this->description, $this->data);
-            $content = $this->parseIf($content);
-        } else {
-            $content = $this->content;
+            //$content = $this->parseExpression($content, $this->description, $this->data);
+            $content = $this->includeContent($content);
+            $content = $this->parseNode($content);
         }
-        return $this->parseConstant($content);
+        return $content;
+    }
+
+    public function includePath(&$name)
+    {
+        if (!$this->isEmptyString($name)) {
+            $name = $this->transformPath($name);
+            return true;
+        }
+        return false;
     }
 
     private function parseComment($content)
@@ -78,7 +88,7 @@ class Template extends LinePHP
 
     private function parseNote($content)
     {
-        return preg_replace('/\s*@{([^}]*)}\s*/s', '', $content);
+        return preg_replace('/\s*@{([^}]*)}/s', '', $content);
     }
 
     private function parseExpression($content, $desc, $data)
@@ -98,115 +108,181 @@ class Template extends LinePHP
         }, $content);
     }
 
-    private function parseIf($content)
+    private function includeContent($content)
     {
-        var_dump($content);
-        $callback = function($matchs){
-            var_dump($matchs);
-        };
-        preg_replace_callback('/<\s*if\s*test\s*=\s*([^>]+)>(.*)<\s*\/if\s*>/is', $callback, $content);
-        
-        
-        
-        
-        exit();        
-        $html = new \SimpleXMLElement($content);
-        //$html = new \DOMDocument();
-        //$html->loadXML($content);
-        //$tempNode = $html->createElement("div")->setAttribute("id",self::ID);
-        //$result = $html->getElementsByTagName('if');
-        $result = $html->xpath('body/If');
-        foreach ($result as $if) {
-            $ifRaw = $if->asXML();
-            var_dump($ifRaw);
-            $attrTest = $if->getAttribute('test');
-            if (!empty($attrTest)) {
-                $value = $this->transform($attrTest, $this->data, $this->description);
-                if(is_bool($value)||  is_numeric($value)){
-                    $value = intval($value);
-                    $elseNode = $if->getElementsByTagName('else');
-                    if($value>0) {
-                        if($elseNode->length>0)$if->removeChild($elseNode->item(0));
-                        
-                    }else{
-//                        preg_match('/<\s*else[^>]+>((\s|.)*)<\s*\/else\s*>/',$ifRaw ,$match);
-//                        if(isset($match[1])) {
-//                            $ifFalse = $match[1];
-//                        }else{
-//                            $ifFalse = '';
-//                        }
-//                        $content = str_replace($ifRaw, $ifFalse , $content);
-                    }
-                }else{
-                    throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_if'],500);
-                }
-            }else{
-                throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_if'],500);
-            }
-            
-        }
-        return $content;
-        //exit();
-        $html = new \DOMDocument();
-        $html->loadXML($content);
-        //echo $html->saveHTML();
-        $elements = $html->getElementsByTagName("if");
-        foreach ($elements as $element) {
-            $test = trim($element->getAttribute("test"));
-            $inverse = false;
-            if (stripos($test, "!") === 0)
-                $inverse = true;
-            $test = substr($test, 1);
-            if (stripos($test, ">") > 0) {
-                $expression = explode(">", $test);
-            } elseif (stripos($test, "<") > 0) {
-                $expression = explode("<", $test);
-            } elseif (stripos($test, "<>") > 0) {
-                $expression = explode("<>", $test);
-            } elseif (stripos($test, "=") > 0) {
-                $expression = explode("=", $test);
-            } else {
-                $expression = array($test);
-            }
-            $leftValue = explode(".", $test);
-            if ($test == '')
-                continue;
-            if (count($leftValue) > 0) {
-                $object = $pageData->get($leftValue[0]);
-                if (empty($object) || !is_object($object)) {
-                    throw new TemplateException(Config::$LP_LANG['template_exception'] . ': "' . $test . '" is invalid.');
-                } else {
-                    $value = $object;
-                    for ($i = 1; $i < count($leftValue); $i++) {
-                        $v = $leftValue[$i];
-                        if (property_exists($value, $v)) {
-                            $value = $value->$v;
-                        } else if (method_exists($value, $v)) {
-                            $value = $value->$v();
-                        } else {
-                            throw new TemplateException(Config::$LP_LANG['template_exception'] . ': "' . $test . '" is invalid.');
-                        }
+        $desc = $this->description;
+        $obj = $this;
+        return preg_replace_callback('/<lp:include\s+content\s*=\s*(("([\/\\\\s\w\-\.+=(){}~!@#$%^&]*)")'
+                . '|(\'[\/\\\\s\w\-\.+=(){}~!@#$%^&]*\'))\s*\/\s*>/i', function($match) use ($obj, $desc) {
+            if (isset($match[1])) {
+                $name = substr($match[1], 1, strlen($match[1]) - 2);
+                $name = str_replace(" ", "", $name);
+                if ($obj->includePath($name)) {
+                    if (is_file($name)) {
+                        return file_get_contents($name);
                     }
                 }
-            } elseif (strcasecmp($test, 'true') == 0 || (is_numeric($test) && $test > 0)) {
-                $condition = true;
-            } else {
-                $condition = false;
             }
-            if ($condition) {
-                $element->removeChild($element->getElementsByTagName("else")->item(0));
-            }
-            $childs = $element->childNodes;
-            foreach ($childs as $sub) {
-                
-            }
-        }
-        $content = $html->saveHTML();
+            throw new TemplateException($desc . ':' . Config::$LP_LANG['template_exception_include'] . ',' . htmlspecialchars($match[0]), 500);
+        }, $content);
     }
 
-    private function parseFor()
+    private function parseLayout($dom, &$content)
     {
-        
+        $fragment = $dom->getElementsByTagNameNS('http://www.linephp.com', "layout");
+        if ($fragment && $fragment->length == 1) {
+            $fragNode = $fragment->item(0);
+            $target = $fragNode->getAttribute("target");
+            if (!$this->isEmptyString($target)) {
+                //$target = $this->parseExpression($target, $this->description, $this->data);
+                $fileName = $this->transformPath($target);
+                if (is_file($fileName)) {
+                    $layout = file_get_contents($fileName);
+                    preg_match('/<\s*lp:layout[^>]+>(.*)<\s*\/lp:layout\s*>/Uis', $fragNode->C14N(), $matches);
+                    $layout = preg_replace('/\s*<\s*lp:content\s*\/\s*>\s*/i', $matches[1], $layout);
+                    $content = $this->includeContent($layout);
+                    return true;
+                }
+            }
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_layout'] . ',' . $fileName, 500);
+        }
+        return false;
+    }
+
+    private function isSkipNode($node)
+    {
+        if ($node->nodeType == 3) {
+            if (preg_match('/^\s*$/', $node->textContent)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isEmptyString(&$str)
+    {
+        if (!isset($str))
+            return true;
+        $str = str_replace(" ", "", $str);
+        if ($str == '')
+            return true;
+        return false;
+    }
+
+    private function transformPath($path)
+    {
+        $path = $this->parseExpression($path, $this->description, $this->data);
+        return preg_replace_callback('/^[\/\\\]+/', function($match) {
+            return '';
+        }, $path);
+    }
+
+    private function parseNode(&$content, $dom = null, $tag = false, $temp = null)
+    {
+        if (isset($dom)) {
+            $html = $content;
+        } else {
+            $dom = new \DOMDocument();
+            $dom->loadXML($content);
+            if ($this->parseLayout($dom, $content)) {
+                return $this->parseNode($content);
+            }
+            $htmls = $dom->getElementsByTagName("html");
+            if ($htmls && $htmls->length == 1) {
+                $html = $htmls->item(0);
+            } else {
+                throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_html'], 500);
+            }
+        }
+        if ($html->nodeType == 8) {
+            return;
+        }
+        $childs = $html->childNodes;
+        //foreach ($html->childNodes as $node) {
+        for ($i = 0; $i < $childs->length; $i++) {
+            $node = $childs->item($i);
+            if (!$this->isSkipNode($node)) {
+                //process attributes
+                $attributes = $node->attributes;
+                if ($attributes) {
+                    foreach ($attributes as $attribute) {
+                        $attribute->value = $this->parseExpression($attribute->value, $this->description, $this->data);
+                    }
+                }
+                if ($node->nodeType == 3) {//process text node
+                    $node->nodeValue = $this->parseExpression($node->nodeValue, $this->description, $this->data);
+                } elseif ($node->nodeName == 'lp:if') {//process 'if' tag
+                    $this->parseIf($node, $html, $dom, $temp);
+                } elseif ($node->nodeName == 'lp:for') {//process 'for' tag
+                    $this->parseFor($node, $html, $dom, $temp);
+                } else {
+                    $node = $this->parseNode($node, $dom);
+                }
+            }
+        }
+        if ($tag) {
+            if (!isset($temp))
+                $temp = $dom->createElement("lp:temp");
+            $length = $childs->length;
+            for ($i = 0; $i < $length; $i++) {
+                if (!($this->isSkipNode($childs->item($i)) && $i + 1 < $length && !$this->isSkipNode($childs->item($i + 1)))) {
+                    $temp->appendChild($childs->item($i)->cloneNode(true));
+                }
+            }
+            return $temp;
+        }
+        if (is_string($content)) {
+            //return $dom->saveXML();
+            return preg_replace(array("/\s*<lp:temp>/", "/\s*<\/lp:temp>/"), array("", ""), $dom->saveXML());
+        } else {
+            return $html;
+        }
+    }
+
+    private function parseIf($node, $html, $dom, &$temp)
+    {
+        $test = $node->getAttribute("test");
+        $value = $this->transform($test, $this->data, $this->description);
+        if (is_bool($value) || is_numeric($value)) {
+            $value = intval($value);
+            $else = $node->getElementsByTagName('else');
+            $else = $else->length == 1 ? $else->item(0) : null;
+            if ($value > 0) {
+                if ($else) {
+                    $node->removeChild($else);
+                }
+                $temp = $this->parseNode($node, $dom, true);
+                //$tmp = $dom->getElementsByTagName("lp:temp")->item(0);
+                $html->replaceChild($temp, $node);
+            } else {
+                if ($else) {
+                    $temp = $this->parseNode($else, $dom, true);
+                    $html->replaceChild($temp, $node);
+                } else {
+                    $html->removeChild($node);
+                }
+            }
+        }
+    }
+
+    private function parseFor($node, $html, $dom, &$temp)
+    {
+        $source = $node->getAttribute("source");
+        $value = $node->getAttribute("value");
+        $index = $node->getAttribute("index");
+        if (!isset($source) || !isset($value)) {
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_for'], 500);
+        }
+        $obj = $this->data->get($source);
+        $i = 1;
+        foreach ($obj as $item) {
+            $itemNode = $node->cloneNode(true);
+            $this->data->set($index, $i);
+            $this->data->set($value, $item);
+            $i++;
+            $temp = $this->parseNode($itemNode, $dom, true, $temp);
+        }
+        $html->replaceChild($temp, $node);
     }
 
     private function parseConstant($content)
@@ -216,6 +292,8 @@ class Template extends LinePHP
 
     private function transform($content, $data, $desc)
     {
+        if (!isset($content))
+            return null;
         $exp = new Expression($content, $data, $desc);
         return $exp->parse();
     }
