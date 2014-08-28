@@ -23,8 +23,10 @@
 
 namespace line\core\mvc;
 
+use line\core\Config;
 use line\core\request\Request;
 use line\core\response\Response;
+use line\core\exception\InvalidRequestException;
 
 /**
  * 
@@ -52,14 +54,12 @@ class Router extends BaseMVC
     {
         $controller = new Controller($this->request);
         $url = $this->request->url;
-//        if (isset($url)) {
         $status = $controller->callDefinedController($url);
-//        } else {
-//            $status = $controller->callDefaultController();
-//        }
         if (is_array($status)) {
             $response = new Response($status[1], $status[0]);
             $response->render();
+        } else {
+            throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":" . $url, 500);
         }
     }
 
