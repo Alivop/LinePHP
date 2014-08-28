@@ -59,9 +59,9 @@ class Filter extends LinePHP
         }
         //前端使用的路径前缀
         define('LP', $dir);
-        define('LP_A', $dir . Config::$LP_PATH[Config::PATH_APP] . '/');
-        define('LP_P', $dir . Config::$LP_PATH[Config::PATH_PAGE] . '/');
-        define('LP_T', $dir . Config::$LP_PATH[Config::PATH_PAGE] . '/' . Config::$LP_SYS[Config::SYS_TEMPLATE_DIR] . '/');
+        define('LP_A', $dir . Config::$LP_PATH[Config::PATH_APP] . LP_DS);
+        define('LP_P', $dir . Config::$LP_PATH[Config::PATH_PAGE] . LP_DS);
+        define('LP_T', $dir . Config::$LP_PATH[Config::PATH_PAGE] . LP_DS . Config::$LP_SYS[Config::SYS_TEMPLATE_DIR] . LP_DS);
     }
 
     /**
