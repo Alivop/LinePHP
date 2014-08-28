@@ -29,7 +29,7 @@ use line\core\response\Response;
 use line\core\exception\InvalidRequestException;
 
 /**
- * 
+ * MVC core . The Router.
  * @class Router
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
