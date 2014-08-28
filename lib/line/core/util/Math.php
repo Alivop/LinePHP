@@ -26,10 +26,10 @@ namespace line\core\util;
 use line\core\LinePHP;
 use line\core\Config;
 use line\core\util\StringUtil;
-use line\core\exception\ExpressionException;
+use line\core\template\exception\ExpressionException;
 
 /**
- * math util
+ * Arithmetic operations class
  * @class Math
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
@@ -141,8 +141,6 @@ class Math extends LinePHP
         while ($p = array_pop($symbol)) {
             $final[] = $p;
         }
-        //echo implode(' ',$final)."<br/>";
-        //var_dump($final);
         self::computeArithmetic($final, $value);
         return $value;
     }
@@ -154,9 +152,9 @@ class Math extends LinePHP
         $plusminus = array('-', '+');
         $tLevel = in_array($top, $plusminus) ? 1 : 2;
         $eLevel = in_array($exp, $plusminus) ? 1 : 2;
-        if ($eLevel <= $tLevel) {//优先级大，弹出
+        if ($eLevel <= $tLevel) {//pull
             return true;
-        } else {//压入
+        } else {//push
             return false;
         }
     }
@@ -243,8 +241,6 @@ class Math extends LinePHP
         while ($p = array_pop($symbol)) {
             $final[] = $p;
         }
-        //echo implode(' ',$final)."<br/>";
-        //var_dump($final);
         self::computeLogic($final, $value);
         return $value;
     }
