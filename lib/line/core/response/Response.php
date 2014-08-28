@@ -29,6 +29,7 @@ use line\core\exception\UnsupportedException;
 use line\core\util\StringUtil;
 use line\core\exception\FileNotFoundException;
 use line\core\template\Template;
+
 /**
  * The response class
  * @class Response
@@ -41,13 +42,14 @@ class Response extends LinePHP
 {
 
     const EXT = '.php';
+
     private $target;
     private $data;
     private $type;
     private $supportType;
     private $charset;
 
-    public function __construct($data = null, $target = null ,$type = null, $charset = null)
+    public function __construct($data = null, $target = null, $type = null, $charset = null)
     {
         $this->target = $target;
         $this->data = $data;
