@@ -67,6 +67,7 @@ class Filter extends LinePHP
     /**
      * 2014-05-21 更正获取不包含querystring的URL
      * 2014-06-07 过滤子目录
+     * 2014-09-02 add 'index.php' filter
      * @param string $url
      * @return string
      */
@@ -77,7 +78,7 @@ class Filter extends LinePHP
         if (count($urlArray) > 0)
             $url = $urlArray[0];
         //if ($subPath == '/')
-        if (!isset($url) || strcmp("//", $url) == 0 || strcmp("///", $url) == 0)
+        if (!isset($url) || strcmp("//", $url) == 0 || strcmp("///", $url) == 0 ||strcasecmp($url, '/index.php')==0)
             $url = "/";
         $dir = self::getMainDir();
         if ($dir == '')
