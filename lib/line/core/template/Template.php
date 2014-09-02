@@ -182,6 +182,7 @@ class Template extends LinePHP
         if (isset($dom)) {
             $html = $content;
         } else {
+            $content = str_replace(array("&"), array("&amp;"), $content);
             $dom = new \DOMDocument();
             $dom->loadXML($content);
             if ($this->parseLayout($dom, $content)) {
@@ -233,7 +234,7 @@ class Template extends LinePHP
         }
         if (is_string($content)) {
             //return $dom->saveXML();
-            return preg_replace(array("/\s*<lp:temp>/", "/\s*<\/lp:temp>/"), array("", ""), $dom->saveXML());
+            return preg_replace(array("/\s*<lp:temp>/", "/\s*<\/lp:temp>/","/&amp;/"), array("","","&"), $dom->saveHTML());
         } else {
             return $html;
         }
