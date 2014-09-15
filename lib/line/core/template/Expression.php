@@ -111,7 +111,9 @@ class Expression extends LinePHP
                     }
                     array_shift($varObj);
                     foreach ($varObj as $v) {
-                        if (property_exists($value, $v)) {
+                        if(is_array($value)){
+                            $value = $value[$v];
+                        }else if (property_exists($value, $v)) {
                             $value = $value->$v;
                         } else if (method_exists($value, $v)) {
                             $value = $value->$v();
