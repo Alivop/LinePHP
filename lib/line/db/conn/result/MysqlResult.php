@@ -69,7 +69,8 @@ class MysqlResult extends Result
 
     public function getColumn($column)
     {
-        return current($this->result)[$column];
+        $current = current($this->result);
+        return $current[$column];
     }
 
     public function getColumnNames()
