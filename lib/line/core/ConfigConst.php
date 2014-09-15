@@ -20,9 +20,11 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\core;
 
-require_once 'lib\line\core\LinePHP.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'LinePHP.php';
+
 /**
  * 
  * @class ConfigConst
@@ -33,6 +35,7 @@ require_once 'lib\line\core\LinePHP.php';
  */
 class ConfigConst extends LinePHP
 {
+
     //系统配置常量
     const SYS_MODE = 'mode';
     const SYS_LANGUAGE = 'language_default';

@@ -20,6 +20,7 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\core\filter;
 
 use line\core\LinePHP;
@@ -36,6 +37,7 @@ use line\core\exception\InvalidRequestException;
  */
 class Filter extends LinePHP
 {
+
     /**
      * 2014-05-21 重新定义获取ROOT文件夹，不同服务器下获取的目录分隔符不一样，如apache:/,windows:\ 
      * 2014-06-07 考虑到子目录情况，重新获取文件的相对URL
@@ -46,6 +48,10 @@ class Filter extends LinePHP
     {
         $dir = self::getMainDir(); //2014-06-07
         $file = $dir . self::filterURL();
+        if (stripos($file, '/' . LP_LIBRARY . '/')!==false ||
+                stripos($file,'/' . Config::$LP_PATH[Config::PATH_APP] . '/') !==false ) {
+            exit(0);
+        }
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         if (strcasecmp($ext, 'php') == 0) {
             $file = substr($file, 1); //2014-06-17
@@ -74,11 +80,12 @@ class Filter extends LinePHP
     public static function filterURL()
     {
         $url = filter_input(INPUT_SERVER, 'REQUEST_URI');
+        if(!isset($url)) $url = $_SERVER['REQUEST_URI'];
         $urlArray = explode("?", $url);
         if (count($urlArray) > 0)
             $url = $urlArray[0];
         //if ($subPath == '/')
-        if (!isset($url) || strcmp("//", $url) == 0 || strcmp("///", $url) == 0 ||strcasecmp($url, '/index.php')==0)
+        if (!isset($url) || strcmp("//", $url) == 0 || strcmp("///", $url) == 0 || strcasecmp($url, '/index.php') == 0)
             $url = "/";
         $dir = self::getMainDir();
         if ($dir == '')
@@ -98,7 +105,7 @@ class Filter extends LinePHP
                 self::filterParameter($value);
         } else {
             //过滤HTML代码
-            $param = htmlspecialchars($param, ENT_QUOTES | ENT_IGNORE);//2014-07-30 change flags parameter ENT_XHTML(PHP5.4) to ENT_IGNORE
+            $param = htmlspecialchars($param, ENT_QUOTES | ENT_IGNORE); //2014-07-30 change flags parameter ENT_XHTML(PHP5.4) to ENT_IGNORE
             //过滤SQL特殊字符和通配符
             //$param = str_replace(array('\\', "'", '"', '_', "%", '[', ']', '[!', '[!'), array('\\\\', "\'", '\"','\_', '\%', '\[', '\]', '\[', '\[!'), $param);
             //过滤SQL关键词

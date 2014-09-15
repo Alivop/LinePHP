@@ -177,6 +177,15 @@ class Template extends LinePHP
         }, $path);
     }
 
+    /**
+     * 2014-09-02 convert any special symbol
+     * @param type $content
+     * @param \DOMDocument $dom
+     * @param type $tag
+     * @param type $temp
+     * @return type
+     * @throws TemplateException
+     */
     private function parseNode(&$content, $dom = null, $tag = false, $temp = null)
     {
         if (isset($dom)) {

@@ -41,7 +41,7 @@ use line\core\template\Template;
 class Response extends LinePHP
 {
 
-    const EXT = '.php';
+    const EXT = '.lpl';
 
     private $target;
     private $data;
@@ -132,6 +132,7 @@ class Response extends LinePHP
         } else {
             $pagePath = LP_ROOT . Config::$LP_PATH[Config::PATH_PAGE] . LP_DS . Config::$LP_SYS[Config::SYS_TEMPLATE_DIR] . LP_DS;
             $pageFile = $pagePath . $this->target;
+            $pageFile = str_replace("\\", "/", $pageFile);
             $ext = pathinfo($pageFile, PATHINFO_EXTENSION);
             if (empty($ext)) {
                 $pageFile .= self::EXT;
@@ -155,7 +156,7 @@ class Response extends LinePHP
                     $tp = new Template($content, null, $pageFile);
                 }
                 header("Content-type: text/html; charset= $this->charset");
-                echo $tp->parse();
+                echo htmlspecialchars_decode($tp->parse());
                 ob_end_flush();
             } else {
                 throw new FileNotFoundException(StringUtil::systemFormat(Config::$LP_LANG['file_not_exist'], $pageFile));

@@ -29,7 +29,7 @@ use line\core\exception\IllegalAccessException;
 use line\core\util\Map;
 use line\io\upload\Siglefile;
 use line\io\upload\Multifile;
-
+use line\core\mvc\View;
 /**
  * 控制器。
  * @class Controller
@@ -68,7 +68,7 @@ class Controller extends BaseMVC
         $this->methodSuffix = Config::$LP_SYS[Config::SYS_METHOD_SUFFIX];
         $this->parameterMap = new Map();
         $this->oneParamter = false;
-        spl_autoload_unregister('line\core\Config::autoLoadClass');
+        //spl_autoload_unregister('line\core\Config::autoLoadClass');
         spl_autoload_register(array($this, 'autoLoadControllerClass'), true, true);
     }
 
@@ -328,6 +328,7 @@ class Controller extends BaseMVC
 
     private function autoLoadControllerClass($class)
     {
+        $class = str_replace("\\","/",$class);
         $sourceLib = LP_LIBRARY_PATH . "{$class}.php";
         $sourceApp = $this->application . "{$class}.php";
         if (is_file($sourceLib)) {
@@ -341,7 +342,6 @@ class Controller extends BaseMVC
 
     private function loadUserLineClass($name)
     {
-        $name = strtolower($name);
         if (in_array($name, Router::$LINE_CORE)) {
             $line = LP_CORE_LINE;
         } else if (in_array($name, Router::$LINE_IO)) {

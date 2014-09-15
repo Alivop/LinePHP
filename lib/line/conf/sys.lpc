@@ -13,23 +13,30 @@
 ;         2.产品模式(production)
 ;默认为开发模式。产品模式下，日志自动采用文件模式(FileAppender)。
 ;设置了日志的记录方式，产品模式：FileAppender(写入文件)、开发模式：ConsoleAppender(直接显示)
+
 ;mode = production
 
 ;默认语言
+
 ;language_default = zh-CN
 
 ;是否开启支持多语言，默认Off，如果开启(On)，则系统会开启session，那么在开发过程中如果
 ;要请使用session请先检查session的状态，否则会出错。
+
 ;language_multiple = Off
 
 ;编码
+
 ;encode = UTF-8
 
 ;控制器类前后缀是在编写控制类的时候写的完整类名称，而URL中控制器则是除去前后缀的名称。
 ;例如：URL中/Index，前缀是Do，后缀是Action，那么控制器类名就是DoIndexAction。
 ;类前缀
+
 ;class_prefix = 
+
 ;类后缀
+
 ;class_suffix = Action
 
 ;控制器类方法前后缀同类前后缀。

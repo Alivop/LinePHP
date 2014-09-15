@@ -20,9 +20,11 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\core;
 
-require_once 'lib\line\core\ConfigConst.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'ConfigConst.php';
+
 use line\core\util\StringUtil;
 use line\core\exception\SystemFileNotFoundException;
 use line\core\exception\InvalidRequestException;
@@ -38,6 +40,7 @@ use line\logger\Level;
  */
 class Config extends ConfigConst
 {
+
     public static $LP_PATH = array();        //应用目录
     public static $LP_LOG = array();         //日志
     public static $LP_SYS = array();         //系统
@@ -63,13 +66,13 @@ class Config extends ConfigConst
                 case E_USER_NOTICE :
                 case E_DEPRECATED :
                 case E_USER_DEPRECATED :
-                    $msg = "<span style='font-weight:bold'>WARNING:</span><span style='color:#CD0000'>[".$errfile .
-                        "(line:$errline)]</span>" . $errstr;
+                    $msg = "<span style='font-weight:bold'>WARNING:</span><span style='color:#CD0000'>[" . $errfile .
+                            "(line:$errline)]</span>" . $errstr;
                     $logger->log(Level::SYSTEM, $msg);
                     break;
                 default :
-                    $msg = "<span style='font-weight:bold'>ERROR   :</span><span style='color:#CD0000;font-weight:bold'>[".$errfile 
-                        . "(line:$errline)]" . $errstr."</span>";
+                    $msg = "<span style='font-weight:bold'>ERROR   :</span><span style='color:#CD0000;font-weight:bold'>[" . $errfile
+                            . "(line:$errline)]" . $errstr . "</span>";
                     $logger->log(Level::SYSTEM, $msg);
                     exit();
             }
@@ -322,11 +325,13 @@ class Config extends ConfigConst
 
     private static function autoLoadClass($class)
     {
+        
         if (strpos($class, '\\') === false) {
             $source = LP_CORE_ABSTRACT . "{$class}.php";
         } else {
             $source = LP_LIBRARY_PATH . "{$class}.php";
         }
+        $source = str_replace("\\","/",$source);
         if (is_file($source)) {
             require_once($source);
         } else {

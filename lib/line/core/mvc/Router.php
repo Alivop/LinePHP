@@ -55,9 +55,11 @@ class Router extends BaseMVC
         $controller = new Controller($this->request);
         $url = $this->request->url;
         $status = $controller->callDefinedController($url);
-        if (is_array($status)) {
-            $response = new Response($status[1], $status[0]);
-            $response->render();
+        if ($status) { //fix reutrn 'true'
+            if (is_array($status)) {
+                $response = new Response($status[1], $status[0]);
+                $response->render();
+            }
         } else {
             throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":" . $url, 500);
         }
@@ -65,9 +67,9 @@ class Router extends BaseMVC
 
     private function initUserLine()
     {
-        self::$LINE_CORE = array('view', 'page', 'data', 'arraylist', 'set', 'map', 'request', 'stringutil');
-        self::$LINE_IO = array('file');
-        self::$LINE_DB = array('dbfactory', 'result', 'statement');
+        self::$LINE_CORE = array('View', 'Page', 'Data', 'Arraylist', 'Set', 'Map', 'Request', 'StringUtil');
+        self::$LINE_IO = array('File');
+        self::$LINE_DB = array('DbFactory', 'Result', 'Statement');
     }
 
 }

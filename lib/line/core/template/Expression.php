@@ -64,6 +64,7 @@ class Expression extends LinePHP
     public function parse()
     {
         $expression = $this->transform($this->page, $this->map);
+        if($expression=='') return '';
         if (is_bool($expression)) {
             return $expression;
         } elseif (strcasecmp($expression, 'true') == 0) {
@@ -77,7 +78,7 @@ class Expression extends LinePHP
             } else {
                 return $this->parseArithmetic($expression);
             }
-        } elseif (strpos('!', $expression) == 0 && $this->varCount <= 1) {
+        } elseif (strpos('!', $expression) === 0 && $this->varCount <= 1) {
             return $this->parseLogic($expression);
         }
         return str_replace("+", "", $expression);
