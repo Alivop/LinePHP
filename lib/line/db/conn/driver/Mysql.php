@@ -122,8 +122,12 @@ class Mysql extends BaseConn implements DB
             $return = $this->conn->query($sql);
             if ($return === false || $return === true) {
                 return $return;
-            } else {//2014-09-15 change 'fetch_all' to 'fetch_array','fetch_all' used by mysqlnd. 
-                $result = new MysqlResult($return->fetch_array(MYSQLI_ASSOC), $return->field_count, $return->num_rows, $return->fetch_fields());
+            } else {//2014-09-15 change 'fetch_all' to 'fetch_array','fetch_all' used by mysqlnd.
+                $rows = array();
+                while($row = $return->fetch_array(MYSQLI_ASSOC)){
+                    $rows[] = $row; 
+                }
+                $result = new MysqlResult($rows, $return->field_count, $return->num_rows, $return->fetch_fields());
                 $return->close();
                 return $result;
             }
