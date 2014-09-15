@@ -243,7 +243,7 @@ class Template extends LinePHP
         }
         if (is_string($content)) {
             //return $dom->saveXML();
-            return preg_replace(array("/\s*<lp:temp>/", "/\s*<\/lp:temp>/","/&amp;/"), array("","","&"), $dom->saveHTML());
+            return preg_replace(array("/\s*<lp:temp>/", "/\s*<\/lp:temp>/", "/&amp;/"), array("", "", "&"), $dom->saveHTML());
         } else {
             return $html;
         }
@@ -284,13 +284,17 @@ class Template extends LinePHP
             throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_for'], 500);
         }
         $obj = $this->data->get($source);
-        $i = 1;
-        foreach ($obj as $item) {
-            $itemNode = $node->cloneNode(true);
-            $this->data->set($index, $i);
-            $this->data->set($value, $item);
-            $i++;
-            $temp = $this->parseNode($itemNode, $dom, true, $temp);
+        if (is_object($obj) || is_array($obj)) {
+            $i = 1;
+            foreach ($obj as $item) {
+                $itemNode = $node->cloneNode(true);
+                $this->data->set($index, $i);
+                $this->data->set($value, $item);
+                $i++;
+                $temp = $this->parseNode($itemNode, $dom, true, $temp);
+            }
+        }else{
+            $temp = $dom->createElement("lp:temp");
         }
         $html->replaceChild($temp, $node);
     }
