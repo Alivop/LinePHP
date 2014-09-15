@@ -1,5 +1,4 @@
-
-#Options -Indexes
+Options -Indexes
 <FilesMatch .(lpc|lang)$>
 Order allow,deny
 Deny from all
@@ -7,7 +6,6 @@ Deny from all
 
 <IfModule mod_rewrite.c>
 RewriteEngine on
-#RewriteCond %{REQUEST_URI} !^/(application|lib)/ [NC]
 RewriteRule (application|lib)/ - [F,L]
 RewriteRule ^([a-zA-Z]{1}[\w]*/){0,3}[\w:]*((\.php)|(\.lpc)|(\.lang))?$ index.php [L,NE]
 </IfModule>
