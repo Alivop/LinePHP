@@ -293,9 +293,8 @@ class Template extends LinePHP
                 $i++;
                 $temp = $this->parseNode($itemNode, $dom, true, $temp);
             }
-        }else{
-            $temp = $dom->createElement("lp:temp");
         }
+        if(!isset($temp)) $temp = $dom->createElement("lp:temp");
         $html->replaceChild($temp, $node);
     }
 
