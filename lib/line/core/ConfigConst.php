@@ -36,7 +36,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'LinePHP.php';
 class ConfigConst extends LinePHP
 {
 
-    //系统配置常量
+    //system config
     const SYS_MODE = 'mode';
     const SYS_LANGUAGE = 'language_default';
     const SYS_LANGUAGE_MULTIPLE = 'language_multiple';
@@ -53,12 +53,12 @@ class ConfigConst extends LinePHP
     const SYS_LANGUAGE_MULTIPLE_OFF = 'OFF';
     const SYS_ENCODE_DEFAULT = 'UTF-8';
     const SYS_TEMPLATE_DIR_DEFAULT = 'default';
-    //路径配置常量
+    //path config
     const PATH_APP = 'app';
     const PATH_PAGE = 'page';
     const PATH_APP_DEFAULT = 'application';
     const PATH_PAGE_DEFAULT = 'page';
-    //日志配置常量
+    //logger cofig
     const LOG_LOGGER = 'logger';
     const LOG_LEVEL = 'level';
     const LOG_APPENDER = 'appender';
@@ -81,7 +81,7 @@ class ConfigConst extends LinePHP
     const INFO = 'INFO';
     const WARN = 'WARN';
     const ERROR = 'ERROR';
-    //数据库配置
+    //database config
     const DB_DRIVER = 'driver';
     const DB_TYPE = 'type';
     const DB_HOST = 'host';

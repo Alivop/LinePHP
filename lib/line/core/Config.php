@@ -41,21 +41,20 @@ use line\logger\Level;
 class Config extends ConfigConst
 {
 
-    public static $LP_PATH = array();        //应用目录
-    public static $LP_LOG = array();         //日志
-    public static $LP_SYS = array();         //系统
-    public static $LP_LANG = array();        //系统内部语言
+    public static $LP_PATH = array();        //app path
+    public static $LP_LOG = array();         //log
+    public static $LP_SYS = array();         //system
+    public static $LP_LANG = array();        //interior language
     public static $LP_DB = array();
 
     /**
-     * 2014-04-11 session默认开启。
+     * 2014-04-11 session opened for default
      */
     public static function init()
     {
         session_start();
         self::initDir();
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            //var_dump($errno, $errstr, $errfile, $errline);
             $logger = \line\logger\Logger::getInstance();
             switch ($errno) {
                 case E_WARNING :
@@ -108,25 +107,16 @@ class Config extends ConfigConst
 
     private static function initDir()
     {
-        //路径分隔符
         define('LP_DS', DIRECTORY_SEPARATOR);
-        //核心库目录
         define('LP_CORE_PATH', __DIR__ . LP_DS);
-        //LinePHP目录
         define('LP_PATH', dirname(LP_CORE_PATH) . LP_DS);
-        //库目录
         define('LP_LIBRARY_PATH', dirname(LP_PATH) . LP_DS);
-        //网站根目录
         define('LP_ROOT', dirname(LP_LIBRARY_PATH) . LP_DS);
-        //配置文件目录
         define('LP_CONF_PATH', LP_PATH . 'conf' . LP_DS);
-        //语言文件目录
         define('LP_LANG_PATH', LP_PATH . 'i18n' . LP_DS);
         define('LP_IO_PATH', LP_PATH . 'io' . LP_DS);
         define('LP_DB_PATH', LP_PATH . 'db' . LP_DS);
-        //日志组件目录
         define('LP_LOG_PATH', LP_PATH . 'logger' . LP_DS);
-        //系统配置文件
         define('LP_CORE_CONF', LP_CORE_PATH . 'config' . LP_DS);
         define('LP_CORE_LINE', LP_CORE_PATH . 'linephp' . LP_DS);
         define('LP_CORE_ABSTRACT', LP_CORE_PATH . 'abstract' . LP_DS);
@@ -159,25 +149,18 @@ class Config extends ConfigConst
                 if ($custom) {
                     self::$LP_SYS[$key] = $custom;
                 } else {
-                    //属性$key获取错误,使用默认值
                     $isError = true;
                 }
             } else {
-                //属性$key未配置,使用默认值
                 $isError = true;
             }
-//            if ($isError) {
-//                $message = StringUtil::systemFormat(self::$LP_LANG['property_error'], $key);
-//                self::console(Level::WARN, $message);
-//                //throw new IllegalPropertyException();
-//            }
         }
         if (strcasecmp(self::$LP_SYS[self::SYS_MODE], self::SYS_MODE_DEVELOPMENT) == 0) {
             self::$LP_LOG[self::LOG_APPENDER] = self::LOG_APPENDER_CONSOLE;
         } else {
             self::$LP_LOG[self::LOG_APPENDER] = self::LOG_APPENDER_FILE;
         }
-        //判断是否开启多语言,需要开启session。
+        //multi-language,need Session.
         if (strcasecmp(self::$LP_SYS[self::SYS_LANGUAGE_MULTIPLE], self::SYS_LANGUAGE_MULTIPLE_ON) === 0) {
             if (!self::isSessionStarted()) {
                 session_start();
@@ -206,20 +189,11 @@ class Config extends ConfigConst
                 if ($custom) {
                     self::$LP_PATH[$key] = $custom;
                 } else {
-                    //error_log('path is not exist',3,'./log.txt');
-                    //echo 'path is not exist,use default';
-                    //属性$key获取错误,使用默认值
                     $isError = true;
                 }
             } else {
-                //属性$key未配置,使用默认值
                 $isError = true;
             }
-//            if ($isError) {
-//                $message = StringUtil::systemFormat(self::$LP_LANG['property_error'], $key);
-//                self::console(Level::WARN, $message);
-//                //throw new IllegalPropertyException();
-//            }
         }
     }
 
@@ -243,20 +217,11 @@ class Config extends ConfigConst
                 if ($custom) {
                     self::$LP_LOG[$key] = $custom;
                 } else {
-                    //error_log('path is not exist',3,'./log.txt');
-                    //echo 'parameter is not exist ,use default';
-                    //属性$key获取错误,使用默认值
                     $isError = true;
                 }
             } else {
-                //属性$key未配置,使用默认值
                 $isError = true;
             }
-//            if ($isError) {
-//                $message = StringUtil::systemFormat(self::$LP_LANG['property_error'], $key);
-//                self::console(Level::WARN, $message);
-//                //throw new IllegalPropertyException();
-//            }
         }
         if (strcasecmp(self::$LP_SYS[self::SYS_MODE], self::SYS_MODE_PRODUCTION) === 0) {
             self::$LP_LOG[self::LOG_APPENDER] = self::LOG_APPENDER_FILE;
@@ -285,28 +250,14 @@ class Config extends ConfigConst
                 if (isset($custom)) {
                     self::$LP_DB[$key] = $custom;
                 } else {
-                    //error_log('path is not exist',3,'./log.txt');
-                    //echo 'parameter is not exist ,use default';
-                    //属性$key获取错误,使用默认值
                     $isError = true;
                     break;
                 }
             } else {
-                //属性$key未配置,使用默认值
                 $isError = true;
             }
-//            if ($isError) {
-//                self::console(Level::WARN, self::$LP_LANG['no_db']);
-//                //throw new IllegalPropertyException();
-//            }
         }
     }
-
-//    public static function systemErrorHandler($errno, $errstr, $errfile, $errline)
-//    {
-//        var_dump($errno, $errstr, $errfile, $errline);
-//        return true;
-//    }
 
     private static function loadSystemLanguage()
     {
@@ -325,13 +276,13 @@ class Config extends ConfigConst
 
     private static function autoLoadClass($class)
     {
-        
+
         if (strpos($class, '\\') === false) {
             $source = LP_CORE_ABSTRACT . "{$class}.php";
         } else {
             $source = LP_LIBRARY_PATH . "{$class}.php";
         }
-        $source = str_replace("\\","/",$source);
+        $source = str_replace("\\", "/", $source);
         if (is_file($source)) {
             require_once($source);
         } else {
@@ -343,8 +294,8 @@ class Config extends ConfigConst
     }
 
     /**
-     * 检查SESSION是否已经开启。
-     * @return boolean 已经开启返回true，否则false。
+     * check whether Session is started
+     * @return boolean Started return true or false。
      */
     protected static function isSessionStarted()
     {

@@ -20,9 +20,9 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\core;
 
-//use line\core\exception\NoSuchMethodException;
 /**
  * The super class of all framework class
  * @class LinePHP
@@ -33,6 +33,7 @@ namespace line\core;
  */
 class LinePHP
 {
+
     private static $container;
 
     public function __call($name, $arguments)
@@ -57,7 +58,7 @@ class LinePHP
         if (!self::$container instanceof util\ArrayList) {
             self::$container = new util\ArrayList;
         }
-        if (key_exists(Config::LOG_APPENDER,Config::$LP_LOG)) {
+        if (key_exists(Config::LOG_APPENDER, Config::$LP_LOG)) {
             if (key_exists(Config::LOG_LEVEL, Config::$LP_LOG) &&
                     strcasecmp(Config::$LP_LOG[Config::LOG_LEVEL], Config::LOG_LEVEL_OFF) != 0) {
                 $logger = \line\logger\Logger::getInstance();

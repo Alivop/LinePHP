@@ -32,13 +32,8 @@
 class Bootstrap
 {
 
-    //const BASE_PATH = dirname(__DIR__).DIRECTORY_SEPARATOR;
-    //const LIB_PATH  = __DIR__.DIRECTORY_SEPARATOR;
-    //function __construct (){
-    //	$this->init();
-    //}
     /**
-     * 启动运行框架
+     * start framework
      * @return void
      */
     public static function start()
@@ -47,12 +42,6 @@ class Bootstrap
             self::init();
             self::run();
         } catch (\Exception $e) {
-            $trace = $e->getTrace();
-//            if (array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0])) {
-//                $message = $trace[0]['file'] . "(line:" . $trace[0]['line'] . "):";
-//            }else{
-//                $message = $trace[1]['file'] . "(line:" . $trace[1]['line'] . "):";
-//            }
             $message = $e->getMessage();
             $logger = line\logger\Logger::getInstance();
             $logger->log(line\logger\Level::ERROR, $message);
@@ -61,7 +50,7 @@ class Bootstrap
     }
 
     /**
-     * 框架初始化
+     * init framework
      * @return void
      */
     private static function init()
@@ -73,7 +62,7 @@ class Bootstrap
     }
 
     /**
-     * 检查PHP版本
+     * check PHP version
      * @return void
      */
     private static function checkPHPVersion()
@@ -85,36 +74,32 @@ class Bootstrap
     }
 
     /**
-     * 检测请求URI
+     * validate uri
      * @return  void
      */
     private static function checkUriExtension()
     {
         $uriExt = pathinfo(filter_input(INPUT_SERVER, 'REQUEST_URI'), PATHINFO_EXTENSION);
         if (!empty($uriExt) && strcasecmp($uriExt, 'lang') == 0 && strcasecmp($uriExt, 'ini') == 0) {
-            //header("Location: /404.html");
-            //include '404.html';
             header('HTTP/1.1 404 Not Found');
             exit(1);
         }
     }
 
     /**
-     * 初始化参数
+     * init parameters 
      * @return void
      */
     private static function initConfig()
     {
-        //设置时区
+        //set timezone
         date_default_timezone_set('Asia/Shanghai');
-        //设置lib库路径
-        //set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(dirname(__DIR__))));
         require_once __DIR__ . DIRECTORY_SEPARATOR . 'Config.php';
         line\core\Config::init();
     }
 
     /**
-     * 加载语言文件
+     * load language file
      * @return void
      */
     private static function initLanguage()
@@ -123,7 +108,7 @@ class Bootstrap
     }
 
     /**
-     * 框架运行。
+     * running framework
      * @return void
      */
     private static function run()
@@ -132,6 +117,11 @@ class Bootstrap
         $request->handler();
     }
 
+    /**
+     * system exception
+     * @param int $code
+     * @return void
+     */
     private static function systemError($code)
     {
         switch ($code) {
