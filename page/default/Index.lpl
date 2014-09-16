@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:lp="http://www.linephp.com">
+    <head>
+        <title>Test-${test}</title>
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+        @{ This is a comment label. }
+        <div>
+            <form action="Index">
+            <input name="name" value="LinePHP"/>
+            <input type="submit" value='say'/>
+            </form>
+            ${name} 
+            <lp:if test="sayHello">
+                Hello World!!!
+            </lp:if>
+        </div>
+    </body>
+</html>
