@@ -59,11 +59,11 @@ class Template extends LinePHP
         }
         $content = $this->parseConstant($this->content);
         if (isset($this->data)) {
-            $content = $this->parseComment($content);
-            $content = $this->parseNote($content);
             //$content = $this->parseExpression($content, $this->description, $this->data);
             $content = $this->includeContent($content);
             $content = $this->parseNode($content);
+            $content = $this->parseComment($content);
+            $content = $this->parseNote($content);
         }
         return $content;
     }
