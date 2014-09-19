@@ -88,11 +88,12 @@ class Template extends LinePHP
 
     private function parseNote($content)
     {
-        return preg_replace('/\s*@{([^}]*)}/s', '', $content);
+        return preg_replace('/\s*@{[^}]*}/s', '', $content);
     }
 
     private function parseExpression($content, $desc, $data)
     {
+        $content = $this->parseConstant($content);
         return preg_replace_callback('/\${([\s!\sa-zA-Z0-9.+\-*\/%\s]+)}/', function($match) use ($desc, $data) {
             if (count($match) == 2 && !empty($match[0])) {
                 $var = str_replace(' ', '', $match[1]);
@@ -172,6 +173,7 @@ class Template extends LinePHP
     private function transformPath($path)
     {
         $path = $this->parseExpression($path, $this->description, $this->data);
+        $path = str_replace("\\", "/", $path);
         return preg_replace_callback('/^[\/\\\]+/', function($match) {
             return '';
         }, $path);
@@ -294,7 +296,8 @@ class Template extends LinePHP
                 $temp = $this->parseNode($itemNode, $dom, true, $temp);
             }
         }
-        if(!isset($temp)) $temp = $dom->createElement("lp:temp");
+        if (!isset($temp))
+            $temp = $dom->createElement("lp:temp");
         $html->replaceChild($temp, $node);
     }
 
