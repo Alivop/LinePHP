@@ -20,22 +20,26 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\db;
+
+use line\core\LinePHP;
 
 /**
  * 
- * @interface Statement
+ * @class Statement
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
  * @since 1.0
  * @package line\db
  */
-interface Statement
+abstract class Statement extends LinePHP
 {
-    const DB_BOOL = 0;
-    const DB_NULL = 1;
-    const DB_INT = 2;
-    const DB_STR = 3;
-    const DB_LOB = 4;
 
+    protected $statement;
+    protected $sql;
+
+    abstract function setParameter($parameter, $value, $type = self::DB_STR);
+    abstract function execute();
+    abstract function close();
 }

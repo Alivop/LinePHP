@@ -20,6 +20,7 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\db;
 
 /**
@@ -32,14 +33,30 @@ namespace line\db;
  */
 interface DB
 {
+
+    const BOOL = 0;
+    const NULL = 1;
+    const INT = 2;
+    const STR = 3;
+    const LOB = 4;
+
     function commit();
+
     function close();
+
     function prepare($sql);
+
     function autoCommit($autoCommit);
+
     function rollback();
-    function charset($charset);
+
+    //2015-02-05 cancel charset function
+    //function charset($charset);
     function connectError();
+
     function queryError();
+
     function beginTransaction();
+
     function query($sql);
 }

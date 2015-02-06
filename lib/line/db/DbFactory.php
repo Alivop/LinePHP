@@ -57,6 +57,7 @@ class DbFactory extends LinePHP
             self::$user = Config::$LP_DB[Config::DB_USER];
             self::$password = Config::$LP_DB[Config::DB_PASSWORD];
             self::$driver = Config::$LP_DB[Config::DB_DRIVER];
+            self::$charset = Config::$LP_DB[Config::DB_CHARSET];
             self::$isInit = true;
         }
     }
@@ -76,20 +77,24 @@ class DbFactory extends LinePHP
     public static function getConnection($host='',$port='',$user='',$password='',$dbname='',$type='',$driver='',$charset='')
     {
         self::init();
-        $host = empty($host)?Config::$LP_DB[Config::DB_HOST]:$host;
-        $port = empty($port)?Config::$LP_DB[Config::DB_PORT]:$port;
-        $user = empty($user)?Config::$LP_DB[Config::DB_USER]:$user;
-        $password = empty($password)?Config::$LP_DB[Config::DB_PASSWORD]:$password;
-        $dbname = empty($dbname)?Config::$LP_DB[Config::DB_NAME]:$dbname;
-        $type = empty($type)?Config::$LP_DB[Config::DB_TYPE]:$type;
-        $driver = empty($driver)?Config::$LP_DB[Config::DB_DRIVER]:$driver;
-        $charset = empty($charset)?Config::$LP_DB[Config::DB_CHARSET]:$charset;
+        $host = empty($host)?self::$host:$host;
+        $port = empty($port)?self::$port:$port;
+        $user = empty($user)?self::$user:$user;
+        $password = empty($password)?self::$password:$password;
+        $dbname = empty($dbname)?self::$name:$dbname;
+        $type = empty($type)?self::$type:$type;
+        $driver = empty($driver)?self::$driver:$driver;
+        $charset = empty($charset)?self::$charset:$charset;
         if (!self::$conn) {
-            self::$driver = strtolower(self::$driver);
-            switch (self::$driver) {
+            $driver = strtolower($driver);
+            switch ($driver) {
                 case 'mysqli':
                     self::$conn = new conn\driver\Mysql($host, $user, $password, $dbname, $port, $charset);
                     self::$error = self::$conn->connectError();
+                    break;
+                case 'pdo' :
+                    self::$conn = new conn\driver\PDO($type, $host, $user, $password, $dbname, $port, $charset);
+                    self::$error = self::$conn->errorInfo();
                     break;
             }
         }

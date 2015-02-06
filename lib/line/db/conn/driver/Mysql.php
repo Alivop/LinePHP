@@ -24,7 +24,6 @@ namespace line\db\conn\driver;
 
 use line\db\DB;
 use line\db\conn\result\MysqlResult;
-use line\core\Config;
 use line\db\conn\BaseConn;
 use line\db\conn\statement\MysqlStatement;
 
@@ -57,9 +56,13 @@ class Mysql extends BaseConn implements DB
         }
     }
 
+    /**
+     * 2015-02-05 add return 
+     * @return boolean
+     */
     public function beginTransaction()
     {
-        $this->conn->begin_transaction();
+        return $this->conn->begin_transaction();
     }
 
     /**

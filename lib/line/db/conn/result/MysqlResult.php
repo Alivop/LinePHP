@@ -26,7 +26,7 @@ use line\db\Result;
 
 /**
  * 
- * @class Result
+ * @class MysqlResult
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
  * @since 1.0
@@ -35,16 +35,6 @@ use line\db\Result;
 class MysqlResult extends Result
 {
     private $columnNames;
-
-    public function getRowCount()
-    {
-        return $this->rowCount;
-    }
-
-    public function getColumnCount()
-    {
-        return $this->columnCount;
-    }
 
     public function getRow($index = 0)
     {
@@ -90,19 +80,23 @@ class MysqlResult extends Result
         return $row;
     }
 
+    /**
+     * 2015-02-06
+     * @return mixed
+     */
     public function first()
     {
-        reset($this->result);
+        return reset($this->result);
     }
 
     public function last()
     {
-        end($this->result);
+        return end($this->result);
     }
 
     public function previous()
     {
-        prev($this->result);
+        return prev($this->result);
     }
 
     public function isFirst()

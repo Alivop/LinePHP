@@ -20,10 +20,12 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\db;
 
 /**
- * 
+ * query resultset
+ * 2015-02-06 remove abstract functions
  * @class Result
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
@@ -32,10 +34,12 @@ namespace line\db;
  */
 abstract class Result extends \line\core\LinePHP
 {
+
     protected $result;
     protected $columnCount;
     protected $rowCount;
     protected $columns;
+    protected $columnNames;
 
     public function __construct($result, $columnCount, $rowCount, $columns)
     {
@@ -43,6 +47,7 @@ abstract class Result extends \line\core\LinePHP
         $this->columnCount = $columnCount;
         $this->rowCount = $rowCount;
         $this->columns = $columns;
+        $this->getColumnNames();
     }
 
     public function getRowCount()
@@ -55,14 +60,79 @@ abstract class Result extends \line\core\LinePHP
         return $this->columnCount;
     }
 
-    abstract public function getRow($index = 0);
-    abstract public function getRowNumber();
-    abstract public function getColumn($column);
-    abstract public function getColumnNames();
-    abstract public function next();
-    abstract public function first();
-    abstract public function last();
-    abstract public function previous();
-    abstract public function isFirst();
-    abstract public function isLast();
+    public function getRow($index = 0)
+    {
+        if (is_int($index) && $index < $this->rowCount)
+            return $this->result[$index];
+        return false;
+        //return current($this->result);
+    }
+
+    public function getRows()
+    {
+        if ($this->result && is_array($this->result)) {
+            return $this->result;
+        }
+        return false;
+    }
+
+    public function getRowNumber()
+    {
+        return key($this->result);
+    }
+
+    public function getColumn($column)
+    {
+        $current = current($this->result);
+        return $current[$column];
+    }
+
+    public function getColumnNames()
+    {
+        if (!isset($this->columnNames)) {
+            foreach ($this->columns as $value) {
+                $this->columnNames[] = $value->name;
+            }
+        }
+        return $this->columnNames;
+    }
+
+    public function next()
+    {
+        $row = current($this->result);
+        next($this->result);
+        return $row;
+    }
+
+    public function first()
+    {
+        return reset($this->result);
+    }
+
+    public function last()
+    {
+        return end($this->result);
+    }
+
+    public function previous()
+    {
+        return prev($this->result);
+    }
+
+    public function isFirst()
+    {
+        $index = key($this->result);
+        if ($index === 0)
+            return true;
+        return false;
+    }
+
+    public function isLast()
+    {
+        $index = key($this->result);
+        if ($index === $this->rowCount - 1)
+            return true;
+        return false;
+    }
+
 }

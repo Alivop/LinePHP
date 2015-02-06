@@ -22,9 +22,9 @@
  */
 namespace line\db\conn\statement;
 
-use line\core\LinePHP;
 use line\db\Statement;
 use line\db\conn\result\MysqlResult;
+use line\db\DB;
 
 /**
  * 
@@ -34,9 +34,8 @@ use line\db\conn\result\MysqlResult;
  * @since 1.0
  * @package line\core\db\conn\statement
  */
-class MysqlStatement extends LinePHP implements Statement
+class MysqlStatement extends Statement
 {
-    private $statement;
     private $parameters;
     private $type;
     private $ref;
@@ -44,6 +43,7 @@ class MysqlStatement extends LinePHP implements Statement
     public function __construct($statement, $sql)
     {
         $this->statement = $statement;
+        $this->sql = $sql;
         $this->parameters = array();
         $this->type[] = '';
         $this->ref = array();
@@ -56,12 +56,12 @@ class MysqlStatement extends LinePHP implements Statement
      * @param int $type
      * @return void
      */
-    public function setParameter($parameter, $value, $type = self::DB_STR)
+    public function setParameter($parameter, $value, $type = DB::STR)
     {
         if (!is_int($parameter))
             return;
         switch ($type) {
-            case self::DB_BOOL:
+            case DB::BOOL:
                 if ($value === true || $value === 'true' || $value === '1' || $value === 1)
                     $value = 1;
                 else
@@ -69,19 +69,19 @@ class MysqlStatement extends LinePHP implements Statement
                 $this->type[0] .= 'i';
                 $this->parameters[$parameter] = $value;
                 break;
-            case self::DB_NULL :
+            case DB::NULL :
                 $this->type[0] .= 's';
                 $this->parameters[$parameter] = null;
                 break;
-            case self::DB_INT:
+            case DB::INT:
                 $this->type[0] .= 'i';
                 $this->parameters[$parameter] = $value;
                 break;
-            case self::DB_STR :
+            case DB::STR :
                 $this->type[0] .= 's';
                 $this->parameters[$parameter] = $value;
                 break;
-            case self::DB_LOB :
+            case DB::LOB :
                 $this->type[0] .= 'b';
                 $this->parameters[$parameter] = $value;
                 break;
