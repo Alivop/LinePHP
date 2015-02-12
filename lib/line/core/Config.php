@@ -228,6 +228,11 @@ class Config extends ConfigConst
         }
     }
 
+    /**
+     * 2015-02-09 add dsn property
+     * @param array $config
+     * @return void
+     */
     private static function initDatabase($config = null)
     {
         self::$LP_DB = array(
@@ -238,7 +243,8 @@ class Config extends ConfigConst
             self::DB_NAME => '',
             self::DB_USER => '',
             self::DB_PASSWORD => '',
-            self::DB_CHARSET => ''
+            self::DB_CHARSET => '',
+            self::DB_DSN => ''
         );
         if (!is_array($config))
             return;
