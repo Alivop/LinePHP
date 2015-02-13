@@ -147,4 +147,12 @@ class MysqlStatement extends Statement
         return $this->statement->insert_id;
     }
 
+    public function getError()
+    {
+        $errorno = $this->statement->errno;
+        if ($errorno === 0)
+            return null;
+        return 'Error Code : ' . $errorno . ',' . $this->statement->error;
+    }
+
 }

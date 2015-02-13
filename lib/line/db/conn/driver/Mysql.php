@@ -44,9 +44,7 @@ class Mysql extends BaseConn implements DB
             if (!$this->conn->connect_error) {
                 $this->conn->set_charset($charset);
             }
-        } else {
-            return $this->conn;
-        }
+        } 
     }
 
     public function autoCommit($autoCommit)

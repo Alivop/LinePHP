@@ -24,7 +24,7 @@
 namespace line\db;
 
 use line\core\LinePHP;
-
+use line\db\DB;
 /**
  * 
  * @class Statement
@@ -38,8 +38,10 @@ abstract class Statement extends LinePHP
 
     protected $statement;
     protected $sql;
+    protected $error;
 
-    abstract function setParameter($parameter, $value, $type = self::DB_STR);
+    abstract function setParameter($parameter, $value, $type = DB::STR);
     abstract function execute();
     abstract function close();
+    abstract function getError();
 }

@@ -20,44 +20,27 @@
  * limitations under the License.
  * ==========================================================================
  */
+namespace line\db\conn\result;
 
-namespace line\db;
+use line\db\Result;
 
 /**
- * 
- * @interface DB
+ * PDO resultset
+ * @class PDOResult
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
- * @since 1.0
- * @package line\core\db
+ * @since 1.4
+ * @package line\db\conn\result
  */
-interface DB
+class PDOResult extends Result
 {
-
-    const BOOL = 0;
-    const NULL = 1;
-    const INT = 2;
-    const STR = 3;
-    const LOB = 4;
-
-    function commit();
-
-    function close();
-
-    function prepare($sql);
-
-    function autoCommit($autoCommit);
-
-    function rollback();
-
-    //2015-02-05 cancel charset function
-    //function charset($charset);
-    //2015-02-13
-    //function connectError();
-
-    function queryError();
-
-    function beginTransaction();
-
-    function query($sql);
+    public function getColumnNames()
+    {
+        if (!isset($this->columnNames)) {
+            foreach ($this->columns as $value) {
+                $this->columnNames[] = $value;
+            }
+        }
+        return $this->columnNames;
+    }
 }

@@ -20,6 +20,7 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\db;
 
 use line\core\LinePHP;
@@ -35,6 +36,7 @@ use line\core\Config;
  */
 class DbFactory extends LinePHP
 {
+
     public static $error;
     private static $driver;
     private static $type;
@@ -46,6 +48,7 @@ class DbFactory extends LinePHP
     private static $conn;
     private static $charset;
     private static $isInit;
+    private static $dsn;
 
     private static function init()
     {
@@ -58,13 +61,16 @@ class DbFactory extends LinePHP
             self::$password = Config::$LP_DB[Config::DB_PASSWORD];
             self::$driver = Config::$LP_DB[Config::DB_DRIVER];
             self::$charset = Config::$LP_DB[Config::DB_CHARSET];
+            self::$dsn = Config::$LP_DB[Config::DB_DSN];
             self::$isInit = true;
         }
     }
 
     /**
      * get database connection
-     * @param string $host
+     * 2015-02-09 add $dsn param
+     *            use array param,the first param $host can be an array,then all params are in the array.
+     * @param mixed $host
      * @param string $port
      * @param string $user
      * @param string $password
@@ -72,19 +78,32 @@ class DbFactory extends LinePHP
      * @param string $type
      * @param string $driver
      * @param string $charset
+     * @param string $dsn
      * @return object
      */
-    public static function getConnection($host='',$port='',$user='',$password='',$dbname='',$type='',$driver='',$charset='')
+    public static function getConnection($host = '', $port = '', $user = '', $password = '', $dbname = '', $type = '', $driver = '', $charset = '', $dsn = '')
     {
         self::init();
-        $host = empty($host)?self::$host:$host;
-        $port = empty($port)?self::$port:$port;
-        $user = empty($user)?self::$user:$user;
-        $password = empty($password)?self::$password:$password;
-        $dbname = empty($dbname)?self::$name:$dbname;
-        $type = empty($type)?self::$type:$type;
-        $driver = empty($driver)?self::$driver:$driver;
-        $charset = empty($charset)?self::$charset:$charset;
+        if (is_array($host)) {
+            $params = $host;
+            $host = isset($params[Config::DB_HOST]) ? $params[Config::DB_HOST] : "";
+            $port = isset($params[Config::DB_PORT]) ? $params[Config::DB_PORT] : "";
+            $user = isset($params[Config::DB_USER]) ? $params[Config::DB_USER] : "";
+            $password = isset($params[Config::DB_PASSWORD]) ? $params[Config::DB_PASSWORD] : "";
+            $dbname = isset($params[Config::DB_NAME]) ? $params[Config::DB_NAME] : "";
+            $type = isset($params[Config::DB_TYPE]) ? $params[Config::DB_TYPE] : "";
+            $driver = isset($params[Config::DB_DRIVER]) ? $params[Config::DB_DRIVER] : "";
+            $charset = isset($params[Config::DB_CHARSET]) ? $params[Config::DB_CHARSET] : "";
+            $dsn = isset($params[Config::DB_DSN]) ? $params[Config::DB_DSN] : "";
+        }
+        $host = empty($host) ? self::$host : $host;
+        $port = empty($port) && empty($driver) ? self::$port : $port;
+        $user = empty($user) ? self::$user : $user;
+        $password = empty($password) ? self::$password : $password;
+        $dbname = empty($dbname) ? self::$name : $dbname;
+        $type = empty($type) ? self::$type : $type;
+        $driver = empty($driver) ? self::$driver : $driver;
+        $charset = empty($charset) ? self::$charset : $charset;
         if (!self::$conn) {
             $driver = strtolower($driver);
             switch ($driver) {
@@ -95,6 +114,25 @@ class DbFactory extends LinePHP
                 case 'pdo' :
                     self::$conn = new conn\driver\PDO($type, $host, $user, $password, $dbname, $port, $charset);
                     self::$error = self::$conn->errorInfo();
+                    break;
+                case 'odbc' :
+                    if (!empty($dsn)) {
+                        self::$conn = new conn\driver\ODBC($dsn, $user, $password);
+                    }
+                    if (odbc_error()) {
+                        self::$error = odbc_errormsg();
+                    }
+                    break;
+                case 'mssql' :
+                    if (!empty($port))
+                        $host = $host . ",$port";
+                    self::$conn = new conn\driver\Mssql($host, $dbname, $user, $password);
+                    if (($errors = sqlsrv_errors(SQLSRV_ERR_ERRORS) ) != null) {
+                        foreach ($errors as $error) {
+                            self::$error .= "code: " . $error['code'] . "<br />";
+                            self::$error .= "message: " . $error['message'] . "<br />";
+                        }
+                    }
                     break;
             }
         }
