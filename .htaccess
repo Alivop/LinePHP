@@ -7,5 +7,5 @@ Deny from all
 <IfModule mod_rewrite.c>
 RewriteEngine on
 RewriteRule (application|lib)/ - [F,L]
-RewriteRule ^([a-zA-Z]{1}[\w]*/){0,3}[\w:]*((\.php)|(\.lpc)|(\.lang))?$ index.php [L,NE]
+RewriteRule ^([a-zA-Z]{1}[\w]*/){0,3}[\d\w:\-]*((\.php)|(\.lpc)|(\.lang))?$ index.php [L,NE]
 </IfModule>
