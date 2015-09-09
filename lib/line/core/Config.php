@@ -53,7 +53,7 @@ class Config extends ConfigConst
     public static function init()
     {
         session_start();
-        self::initDir();
+        //self::initDir();
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             $logger = \line\logger\Logger::getInstance();
             switch ($errno) {
@@ -105,25 +105,6 @@ class Config extends ConfigConst
         }
     }
 
-    private static function initDir()
-    {
-        define('LP_DS', DIRECTORY_SEPARATOR);
-        define('LP_CORE_PATH', __DIR__ . LP_DS);
-        define('LP_PATH', dirname(LP_CORE_PATH) . LP_DS);
-        define('LP_LIBRARY_PATH', dirname(LP_PATH) . LP_DS);
-        define('LP_ROOT', dirname(LP_LIBRARY_PATH) . LP_DS);
-        define('LP_CONF_PATH', LP_PATH . 'conf' . LP_DS);
-        define('LP_LANG_PATH', LP_PATH . 'i18n' . LP_DS);
-        define('LP_IO_PATH', LP_PATH . 'io' . LP_DS);
-        define('LP_DB_PATH', LP_PATH . 'db' . LP_DS);
-        define('LP_LOG_PATH', LP_PATH . 'logger' . LP_DS);
-        define('LP_CORE_CONF', LP_CORE_PATH . 'config' . LP_DS);
-        define('LP_CORE_LINE', LP_CORE_PATH . 'linephp' . LP_DS);
-        define('LP_CORE_ABSTRACT', LP_CORE_PATH . 'abstract' . LP_DS);
-        define('LP_IO_LINE', LP_IO_PATH . 'linephp' . LP_DS);
-        define('LP_DB_LINE', LP_DB_PATH . 'linephp' . LP_DS);
-    }
-
     private static function initSys($config = null)
     {
         //default
@@ -161,13 +142,8 @@ class Config extends ConfigConst
             self::$LP_LOG[self::LOG_APPENDER] = self::LOG_APPENDER_FILE;
         }
         //multi-language,need Session.
-        if (strcasecmp(self::$LP_SYS[self::SYS_LANGUAGE_MULTIPLE], self::SYS_LANGUAGE_MULTIPLE_ON) === 0) {
-            if (!self::isSessionStarted()) {
-                session_start();
-            }
-            if (array_key_exists(LP_LANGUAGE, $_SESSION)) {
-                self::$LP_SYS[self::SYS_LANGUAGE] = $_SESSION[LP_LANGUAGE];
-            }
+        if (array_key_exists(LP_LANGUAGE, $_SESSION)) {
+            self::$LP_SYS[self::SYS_LANGUAGE] = $_SESSION[LP_LANGUAGE];
         }
     }
 
