@@ -53,27 +53,32 @@ class LinePHP
         return '[Object]' . __CLASS__;
     }
 
+    /**
+     * 系统日志
+     * @param string $type
+     * @param string $message
+     * @return void
+     */
     protected static function console($type, $message)
     {
-        if (!self::$container instanceof util\ArrayList) {
-            self::$container = new util\ArrayList;
+        if (!isset(self::$container)) {
+            self::$container = array();
         }
         if (key_exists(Config::LOG_APPENDER, Config::$LP_LOG)) {
             if (key_exists(Config::LOG_LEVEL, Config::$LP_LOG) &&
                     strcasecmp(Config::$LP_LOG[Config::LOG_LEVEL], Config::LOG_LEVEL_OFF) != 0) {
                 $logger = \line\logger\Logger::getInstance();
-                $iterator = self::$container->iterator();
-                while ($iterator->hasNext()) {
-                    $console = $iterator->next();
+                foreach (self::$container as $console) {
+                    //$console = $iterator->next();
                     $logger->log($console[0], $console[1]);
                 }
-                self::$container->clear();
+                array_splice(self::$container,0);
                 $logger->log($type, $message);
             } else {
                 return;
             }
         } else {
-            self::$container->add(array($type, $message));
+            self::$container[] = (array($type, $message));
         }
     }
 
