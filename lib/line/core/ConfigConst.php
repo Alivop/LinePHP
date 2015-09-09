@@ -48,7 +48,7 @@ class ConfigConst extends LinePHP
     const SYS_TEMPLATE_DIR = 'template_dir';
     const SYS_MODE_DEVELOPMENT = 'development';
     const SYS_MODE_PRODUCTION = 'production';
-    const SYS_LANGUAGE_DEFAULT = 'zh-CN';
+    const SYS_LANGUAGE_DEFAULT = 'FALSE';
     const SYS_LANGUAGE_MULTIPLE_ON = 'ON';
     const SYS_LANGUAGE_MULTIPLE_OFF = 'OFF';
     const SYS_ENCODE_DEFAULT = 'UTF-8';
