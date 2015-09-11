@@ -217,44 +217,10 @@ class Controller extends BaseMVC
         return true;
     }
 
-    /**
-     * 2014-04-12 更改POST值设置，允许POST值为空的值。
-     * @deprecated since v1.2
-     */
-    private function getAllPOSTParameter()
-    {
-        $keys = array_keys($_POST);
-        for ($i = 0; $i < count($_POST); $i++) {
-            $key = $keys[$i];
-            $value = $this->request->post($key);
-            //if (isset($value))//2014-04-12
-            $this->parameterMap->set($key, $value);
-        }
-    }
-
-    /**
-     * 2014-05-09 对GET提交的数据进行HTML编码，防止特殊字符引起的错误
-     * 2014-05-13 重新修改数据过滤
-     * 2014-05-14 增加对多个无名参数值的处理，以数组方式赋值过去。
-     *            把lineGET参数赋值到GET数组中(since v1.2)
-     *            原先的获取方式取消，使用系统GET方式
-     * @deprecated since v1.2
-     */
-    private function getAllGETParameter()
-    {
-        $keys = array_keys($_GET);
-        for ($i = 0; $i < count($keys); $i++) {
-            $key = $keys[$i];
-            $value = $this->request->get($key);
-            //if (isset($value))//2014-04-12
-            $this->parameterMap->set($key, $value);
-        }
-    }
-
     private function runMethod($controller, $mixed = null)
     {
         $data = $this->matchAction($controller, $mixed);
-        $this->getParameters();
+        //$this->getParameters();
         if ($data === false) {
             return $this->callAction($controller);
         } else if ($data === true) {
@@ -267,6 +233,7 @@ class Controller extends BaseMVC
     /**
      * 2014-05-14 更改单个/多个无名参数值的赋值
      *            当多个无名参数时，用形参方式传递，参数赋值则是以数组方式按下标顺序赋值
+     * 2015-09-08 更改获取参数方式
      * @param type $methodParams
      * @return type
      */
@@ -304,14 +271,12 @@ class Controller extends BaseMVC
                 }
 //            } else if ($this->parameterMap->size() == 0) {
                 //$methodParamValues[] = null;
-            } else {
-                $value = $this->parameterMap->get($methodParam->getName());
+            } else {//2015-09-08 更改获取参数的方式
+                $value = $this->request->parameter($methodParam->getName());
                 if (!isset($value)) {
-                    if ($this->parameterMap->containsKey($i)) {//2014-05-14
-                        $value = $this->parameterMap->get($i);
+                        $value = $this->request->parameter($i);
                         //$this->parameterMap->remove(0);
                         $i++;
-                    }
                 }
 //                if ($this->parameterMap->containsKey($i)) {//2014-05-14
 //                    $value = $this->parameterMap->get($i);
@@ -359,6 +324,9 @@ class Controller extends BaseMVC
         }
     }
 
+    /**
+     * @deprecated since 1.3
+     */
     private function getParameters()
     {
         $keys = array_keys($_POST);
