@@ -41,7 +41,7 @@ class RequestHandler extends LinePHP
     {
         self::console(\line\core\Config::DEBUG, \line\core\Config::$LP_LANG['framework_run']);
         //try {
-        $this->filterRequest();
+        Filter::checkURL();
         $request = $this->createRequestObject();
         $router = new Router($request);
         $router->dispatcher();
@@ -62,22 +62,18 @@ class RequestHandler extends LinePHP
 //        }
     }
 
-    private function filterRequest()
-    {
-        Filter::checkURL();
-    }
-
     /**
      * 2014-05-21 修正获取request url
+     * 2015-09-08 Resquet加入新的参数（以其他方式提交：put/delete）
+     * 2015-09-08 修改$server参数
      * @return \line\core\request\Request
      */
     private function createRequestObject()
     {
-        $server = $this->newServer();
-        $remote = $this->newRemote();
-        $browser = $this->newBrowser();
+        $server = $_SERVER;
         $url = Filter::filterURL();
-        $request = new Request($remote, $server, $browser, $this->lineGET($url), $this->linePOST(), $this->getUploadFiles());
+        $request = new Request($server, $this->lineGET($url), 
+                $this->linePOST(), $this->getUploadFiles(),  $this->lineOtherParameter());
         $request->method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
         $request->query = filter_input(INPUT_SERVER, 'QUERY_STRING');
         $request->scheme = filter_input(INPUT_SERVER, 'REQUEST_SCHEME');
@@ -89,76 +85,17 @@ class RequestHandler extends LinePHP
         return $request;
     }
 
-    private function newServer()
-    {
-        $addr = filter_input(INPUT_SERVER, 'SERVER_ADDR');
-        $port = filter_input(INPUT_SERVER, 'SERVER_PORT');
-        $name = filter_input(INPUT_SERVER, 'SERVER_NAME');
-        $software = filter_input(INPUT_SERVER, 'SERVER_SOFTWARE');
-        $documentRoot = filter_input(INPUT_SERVER, 'DOCUMENT_ROOT');
-        $scriptName = filter_input(INPUT_SERVER, 'SCRIPT_NAME');
-        $scriptFile = filter_input(INPUT_SERVER, 'SCRIPT_FILENAME');
-        $map = new Map();
-        $map->set('addr', $addr);
-        $map->set('port', $port);
-        $map->set('name', $name);
-        $map->set('software', $software);
-        $map->set('documentRoot', $documentRoot);
-        $map->set('scriptName', $scriptName);
-        $map->set('scriptFile', $scriptFile);
-        return new Server($map);
-    }
-
-    private function newRemote()
-    {
-        $addr = filter_input(INPUT_SERVER, 'SERVER_ADDR');
-        $port = filter_input(INPUT_SERVER, 'SERVER_PORT');
-        $host = filter_input(INPUT_SERVER, 'REMOTE_HOST');
-        $user = filter_input(INPUT_SERVER, 'REMOTE_USER');
-        $map = new Map();
-        $map->set('addr', $addr);
-        $map->set('port', $port);
-        $map->set('host', $host);
-        $map->set('user', $user);
-        return new Remote($map);
-    }
-
-    private function newBrowser()
-    {
-        $acceptType = filter_input(INPUT_SERVER, 'HTTP_ACCEPT');
-        $acceptEncoding = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_ENCODING');
-        $acceptLanguage = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE');
-        $acceptCharset = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_CHARSET');
-        $cookie = filter_input(INPUT_SERVER, 'HTTP_COOKIE');
-        $userAgent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
-        $connection = filter_input(INPUT_SERVER, 'HTTP_CONNECTION');
-        $referer = filter_input(INPUT_SERVER, 'HTTP_REFERER');
-        $map = new Map();
-        $map->set('acceptType', $acceptType);
-        $map->set('acceptEncoding', $acceptEncoding);
-        $map->set('acceptLanguage', $acceptLanguage);
-        $map->set('acceptCharset', $acceptCharset);
-        $map->set('cookie', $cookie);
-        $map->set('userAgent', $userAgent);
-        $map->set('connection', $connection);
-        $map->set('referer', $referer);
-        return new Browser($map);
-    }
-
     /**
      * 2014-05-15 更改LineGET获取的URI为URL，避免URL中其他字符非规定字符造成的错误。
      * 2014-07-04 加入GET参数
+     * 2015-09-09 使用原生数组提升性能
      * @param type $url
-     * @return \line\core\util\Map|null
+     * @return array
      */
     private function lineGET($url)
     {//2014-05-15
         $get = (explode('/', $url));
-        $map = new Map();
-        foreach ($_GET as $key => $value) {//2014-07-04
-            Filter:: filterParameter($value);
-            $map->set($key, $value);
-        }
+        $map = array();
         if (count($get) > 2) {
             $parameter = end($get);
             if (isset($parameter) && $parameter != '') {
@@ -167,58 +104,82 @@ class RequestHandler extends LinePHP
                 foreach ($params as $para) {
                     $arr = explode(':', $para);
                     if (count($arr) == 1) {
-                        //continue;
-                        Filter::filterParameter($arr[0]);
-                        $map->set($i, $arr[0]); //2014-05-14
                         $_GET[] = $arr[0];
                         $i++;
                     } else {
-                        Filter::filterParameter($arr[1]);
-                        $map->set($arr[0], $arr[1]);
                         $_GET[$arr[0]] = $arr[1];
                     }
                 }
             }
         }
+        foreach ($_GET as $key => $value) {//2014-07-04
+            Filter:: filterParameter($value);
+            $map[$key] = $value;
+        }
         return $map;
     }
 
+    /**
+     * 2015-09-09 优化性能
+     * @param array $files
+     * @return array
+     */
     private function getUploadFiles($files = null)
     {
         $files = $_FILES;
-        $map = new Map();
+        $map = array();
         if (!empty($files)) {
             foreach ($files as $key => $value) {
                 if (is_array($value['name'])) {
                     $multi = array();
-                    $list = new \line\core\util\ArrayList;
+                    $list = array();
                     foreach ($value as $subKey => $subValue) {
                         foreach ($subValue as $k => $v) {
                             $multi[$k][$subKey] = $v;
                         }
                     }
                     for ($i = 0; $i < count($multi); $i++) {
-
                         $file = new \line\io\upload\Siglefile($multi[$i]);
-                        $list->add($file);
+                        $list[] = $file;
                     }
                     $upload = new \line\io\upload\Multifile($list);
                 } else {
                     $upload = new \line\io\upload\Siglefile($value);
                 }
-                $map->set($key, $upload);
+                $map[$key] = $upload;
             }
         }
         return $map;
     }
 
+    /**
+     * 2015-09-09 优化性能
+     * @return array
+     */
     private function linePOST()
     {
-        $map = new Map();
+        $map = array();
         foreach ($_POST as $key => $value) {
             Filter:: filterParameter($value);
-            $map->set($key, $value);
-            $_POST[$key] = $value;
+            $map[$key] = $value;
+        }
+        return $map;
+    }
+    
+    /**
+     * 获取其他形式的请求参数，如PUT,DELETE或这POST json参数
+     * @return array
+     */
+    private function lineOtherParameter(){
+        $map = array();
+        $raw = file_get_contents("php://input");
+        $data = json_decode($raw,true);
+        if(!$data){
+            parse_str($raw,$data);
+        }
+        foreach ($data as $key => $value){
+            Filter:: filterParameter($value);
+            $map[$key] = $value;
         }
         return $map;
     }
