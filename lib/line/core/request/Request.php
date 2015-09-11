@@ -61,33 +61,45 @@ class Request extends \Request
     private $getParamMap;
     private $uploadFiles;
     private $postParamMap;
+    private $otherParamMap;
+    private $allParam;
 
-    public function __construct(Remote $remote, Server $server, Browser $browser, $getParamMap, $postParamMap, Map $uploadFiles)
+    public function __construct($server,$getParamMap, $postParamMap, $uploadFiles,$otherParamMap)
     {
-        $this->remote = $remote;
-        $this->browser = $browser;
         $this->server = $server;
         $this->getParamMap = $getParamMap;
         $this->uploadFiles = $uploadFiles;
         $this->postParamMap = $postParamMap;
-    }
-
-    public function parameter($name)
-    {
-        $get = $this->get($name);
-        if (!is_null($get)) {
-            return $get;
-        }
-        return $this->post($name);
+        $this->otherParamMap = $otherParamMap;
+        $this->allParam = array_merge($getParamMap, $postParamMap, $otherParamMap);
     }
 
     /**
-     * 2014-05-09 对POST提交的数据进行HTML编码，防止特殊字符引起的错误
+     * 2015-09-08 添加获取其他请求方式的参数
+     * 2015-09-09 $name为null时返回所有的请求参数
+     * @param string $name
+     * @return null|string 
+     */
+    public function parameter($name=null)
+    {
+        if(is_null($name)) return $this->allParam;
+        $var = $this->inputGet($name);
+        if (!is_null($var)) {
+            return $var;
+        }
+        $var = $this->inputPost($name);
+        if(!is_null($var)){
+            return $var;
+        }
+        return $this->inputOther($name);
+    }
+
+    /**
      * 2014-05-13 过滤转移
      * @param string $name
      * @return null|string
      */
-    public function get($name)
+    public function inputGet($name)
     {
         return $this->getParameter($name, 0); //2014-05-14
     }
@@ -100,7 +112,7 @@ class Request extends \Request
      * @param string $name
      * @return null
      */
-    public function post($name)
+    public function inputPost($name)
     {
         return $this->getParameter($name, 1); //2014-05-14
     }
@@ -110,38 +122,10 @@ class Request extends \Request
         return $this->server;
     }
 
-    public function getRemote()
-    {
-        return $this->remote;
-    }
-
-    public function getBrowser()
-    {
-        return $this->browser;
-    }
-
     public function server($var)
     {
-        if (property_exists($this->server, $var)) {
-            return $this->server->$var;
-        } else {
-            return null;
-        }
-    }
-
-    public function remote($var)
-    {
-        if (property_exists($this->remote, $var)) {
-            return $this->remote->$var;
-        } else {
-            return null;
-        }
-    }
-
-    public function browser($var)
-    {
-        if (property_exists($this->browser, $var)) {
-            return $this->browser->$var;
+        if (key_exists($var,$this->server)) {
+            return $this->server[$var];
         } else {
             return null;
         }
@@ -152,6 +136,15 @@ class Request extends \Request
         //if (isset($name))
         return $this->uploadFiles->get($name);
         //return null;
+    }
+    
+    /**
+     * 2015-09-08 获取其他请求方式的参数
+     * @param type $name
+     * @return type null|string
+     */
+    public function inputOther($name){
+        return $this->getParameter($name, 2);
     }
 
     /**
@@ -169,9 +162,14 @@ class Request extends \Request
                 $val = $this->getParamMap->get($name);
                 return $val;
             }
-        } else {
+        } else if($type == 1) {
             if ($this->postParamMap instanceof Map) {
                 $val = $this->postParamMap->get($name);
+                return $val;
+            }
+        }else{
+            if ($this->otherParamMap instanceof Map) {
+                $val = $this->otherParamMap->get($name);
                 return $val;
             }
         }
