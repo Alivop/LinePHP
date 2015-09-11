@@ -30,14 +30,11 @@
  */
 abstract class Request
 {
-    abstract public function parameter($name);
-    abstract public function get($name);
-    abstract public function post($name);
+    abstract public function parameter($name=null);
+    abstract public function inputGet($name);
+    abstract public function inputPost($name);
     abstract public function getServer();
-    abstract public function getRemote();
-    abstract public function getBrowser();
     abstract public function server($var);
-    abstract public function remote($var);
-    abstract public function browser($var);
     abstract public function getUploadFile($name);
+    abstract public function inputOther($name);
 }
