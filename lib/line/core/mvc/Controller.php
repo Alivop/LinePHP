@@ -213,8 +213,9 @@ class Controller extends BaseMVC
             //    $pageName.=self::EXT;
             //}
             return array($pageName, $dataMap);
+        }else{//2015-09-11 返回值不是视图时候直接退出程序运行
+            exit(0);
         }
-        return true;
     }
 
     private function runMethod($controller, $mixed = null)
@@ -296,12 +297,20 @@ class Controller extends BaseMVC
         $class = str_replace("\\","/",$class);
         $sourceLib = LP_LIBRARY_PATH . "{$class}.php";
         $sourceApp = $this->application . "{$class}.php";
+        $sourceLibCase = LP_LIBRARY_PATH . strtolower("{$class}.php");
+        $sourceAppCase = $this->application . strtolower("{$class}.php");
         if (is_file($sourceLib)) {
             require_once($sourceLib);
         } else if (is_file($sourceApp)) {
             require_once($sourceApp);
-        } else {
-            $this->loadUserLineClass($class);
+        } else {//解决用户在使用中或者url中使用小写文件名
+            if(is_file($sourceLibCase)){
+                require_once($sourceLibCase);
+            }else if(is_file($sourceAppCase)){
+                require_once($sourceAppCase);
+            }else{
+                $this->loadUserLineClass($class);
+            }
         }
     }
 
