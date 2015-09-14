@@ -73,7 +73,7 @@ abstract class Result extends \line\core\LinePHP
         if ($this->result && is_array($this->result)) {
             return $this->result;
         }
-        return false;
+        return array();
     }
 
     public function getRowNumber()
