@@ -95,5 +95,5 @@ class ConfigConst extends LinePHP
     const DB_HOST_DEFAULT = '127.0.0.1';
     const DB_PORT_DEFAULT = '3306';
     const DB_DSN = 'dsn';
-
+    
 }

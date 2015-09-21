@@ -253,7 +253,7 @@ class Config extends ConfigConst
                 }
             }
         }
-        throw new SystemFileNotFoundException('Loaded file "system.lang" error!', 500);
+        throw new SystemFileNotFoundException('Loaded file "system.lang" error!', ERROR_500);
     }
 
     private static function autoLoadClass($class)
@@ -271,7 +271,7 @@ class Config extends ConfigConst
             //echo $source;
             $message = StringUtil::systemFormat(self::$LP_LANG['file_not_exist'], $source);
             self::Level(self::ERROR, $message);
-            throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":{$class}", 400);
+            throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":{$class}", ERROR_400);
         }
     }
 
