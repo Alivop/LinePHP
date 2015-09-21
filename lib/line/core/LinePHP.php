@@ -39,13 +39,13 @@ class LinePHP
     public function __call($name, $arguments)
     {
         $message = ' method [' . __CLASS__ . '->' . $name . '()] is inaccessible .';
-        throw new \Exception('NoSuchMethod:' . $message, 500);
+        throw new \Exception('NoSuchMethod:' . $message, ERROR_500);
     }
 
     public static function __callStatic($name, $arguments)
     {
         $message = ' static method [' . get_called_class() . '::' . $name . '()] is inaccessible .';
-        throw new \Exception('NoSuchMethod:' . $message, 500);
+        throw new \Exception('NoSuchMethod:' . $message, ERROR_500);
     }
 
     public function __toString()
