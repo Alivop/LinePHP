@@ -82,7 +82,7 @@ class Math extends LinePHP
                 }
             }
         } else {
-            throw new ExpressionException(StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), 500);
+            throw new ExpressionException(StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), ERROR_500);
         }
         //return self::parseArithmetic($expression);
     }
@@ -166,7 +166,7 @@ class Math extends LinePHP
             $c = $stack[$i];
             if (in_array($c, $ar)) {
                 if (!is_numeric($stack[$i - 1]) || !is_numeric($stack[$i - 2])) {
-                    throw new ExpressionException(Config::$LP_LANG['expression_exception_nan'], 500);
+                    throw new ExpressionException(Config::$LP_LANG['expression_exception_nan'], ERROR_500);
                 }
                 $n1 = doubleval($stack[$i - 1]);
                 $n2 = doubleval($stack[$i - 2]);
@@ -183,7 +183,7 @@ class Math extends LinePHP
                         break;
                     case '/':
                         if ($n1 == 0) {
-                            throw new ExpressionException(Config::$LP_LANG['expression_exception_nan'], 500);
+                            throw new ExpressionException(Config::$LP_LANG['expression_exception_nan'], ERROR_500);
                         }
                         $v = $n2 / $n1;
                         break;
@@ -301,7 +301,7 @@ class Math extends LinePHP
         if (isset($true)) {
             return $true;
         }
-        throw new ExpressionException(Config::$LP_LANG['expression_exception_logic'], 500);
+        throw new ExpressionException(Config::$LP_LANG['expression_exception_logic'], ERROR_500);
     }
 
 }
