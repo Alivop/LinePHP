@@ -91,7 +91,8 @@ class Response extends LinePHP
             if (in_array($str, $this->supportType)) {
                 $this->type = $str;
             } else {
-                throw new UnsupportedException($this->$target . ',' . Config::$LP_LANG['response'] . StringUtil::systemFormat(Config::$LP_LANG['unsupported_type'], $type), 500);
+                throw new UnsupportedException($this->$target . ',' . Config::$LP_LANG['response'] 
+                        . StringUtil::systemFormat(Config::$LP_LANG['unsupported_type'], $type), ERROR_500);
             }
         } else {
             return $this->type;
