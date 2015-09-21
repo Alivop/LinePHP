@@ -61,7 +61,7 @@ class Router extends BaseMVC
                 $response->render();
             }
         } else {
-            throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":" . $url, 500);
+            throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":" . $url, ERROR_500);
         }
     }
 
