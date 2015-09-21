@@ -55,7 +55,7 @@ class Template extends LinePHP
     public function parse()
     {
         if (!isset($this->content)) {
-            throw new TemplateException($this->description . ':' . Config::$LP_LANG['empty_template'], 500);
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['empty_template'], ERROR_500);
         }
         $content = $this->parseConstant($this->content);
         if (isset($this->data)) {
@@ -124,7 +124,7 @@ class Template extends LinePHP
                     }
                 }
             }
-            throw new TemplateException($desc . ':' . Config::$LP_LANG['template_exception_include'] . ',' . htmlspecialchars($match[0]), 500);
+            throw new TemplateException($desc . ':' . Config::$LP_LANG['template_exception_include'] . ',' . htmlspecialchars($match[0]), ERROR_500);
         }, $content);
     }
 
@@ -145,7 +145,7 @@ class Template extends LinePHP
                     return true;
                 }
             }
-            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_layout'] . ',' . $fileName, 500);
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_layout'] . ',' . $fileName, ERROR_500);
         }
         return false;
     }
@@ -203,7 +203,7 @@ class Template extends LinePHP
             if ($htmls && $htmls->length == 1) {
                 $html = $htmls->item(0);
             } else {
-                throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_html'], 500);
+                throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_html'], ERROR_500);
             }
         }
         if ($html->nodeType == 8) {
@@ -283,7 +283,7 @@ class Template extends LinePHP
         $value = $node->getAttribute("value");
         $index = $node->getAttribute("index");
         if (!isset($source) || !isset($value)) {
-            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_for'], 500);
+            throw new TemplateException($this->description . ':' . Config::$LP_LANG['template_exception_for'], ERROR_500);
         }
         $obj = $this->data->get($source);
         if (is_object($obj) || is_array($obj)) {

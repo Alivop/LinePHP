@@ -49,7 +49,7 @@ class Expression extends LinePHP
     {
         $expression = str_replace(" ", "", $expression);
         if (!self::check($expression)) {
-            throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), 500);
+            throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), ERROR_500);
         }
         $this->expression = $expression;
         $this->map = $map;
@@ -107,7 +107,7 @@ class Expression extends LinePHP
                     $varObj = explode(".", $var);
                     $value = $map->get($varObj[0]);
                     if (is_null($value)) {
-                        throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['unknown_variable'], $var), 500);
+                        throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['unknown_variable'], $var), ERROR_500);
                     }
                     array_shift($varObj);
                     foreach ($varObj as $v) {
@@ -118,7 +118,7 @@ class Expression extends LinePHP
                         } else if (method_exists($value, $v)) {
                             $value = $value->$v();
                         } else {
-                            throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['unknown_variable'], $var), 500);
+                            throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['unknown_variable'], $var), ERROR_500);
                         }
                     }
                 }
@@ -129,7 +129,7 @@ class Expression extends LinePHP
                 }
                 return $value;
             } else {
-                throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), 500);
+                throw new ExpressionException($page . ':' . StringUtil::systemFormat(Config::$LP_LANG['expression_exception'], $expression), ERROR_500);
             }
         }, $this->expression);
         return $expression;
