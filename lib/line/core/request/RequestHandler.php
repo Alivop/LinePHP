@@ -167,19 +167,29 @@ class RequestHandler extends LinePHP
     }
     
     /**
-     * 获取其他形式的请求参数，如PUT,DELETE或这POST json参数
+     * 获取其他形式的请求参数，如PUT,DELETE或者POST json参数或者上传的文件
+     * 2015-10-08 增加对上传文件的处理，优化性能
      * @return array
      */
     private function lineOtherParameter(){
         $map = array();
         $raw = file_get_contents("php://input");
+        if(empty($raw)){
+            return $map;
+        }
         $data = json_decode($raw,true);
         if(!$data){
             parse_str($raw,$data);
         }
-        foreach ($data as $key => $value){
-            Filter:: filterParameter($value);
-            $map[$key] = $value;
+        if(empty($data)){//可能为上传的文件
+            //$temp = tmpfile();//创建临时文件
+            //fwrite($temp, $data);
+            $map["_temp"] = $data;
+        }else{
+            foreach ($data as $key => $value){
+                Filter:: filterParameter($value);
+                $map[$key] = $value;
+            }
         }
         return $map;
     }
