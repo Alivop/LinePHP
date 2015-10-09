@@ -71,7 +71,7 @@ class Request extends \Request
         $this->uploadFiles = $uploadFiles;
         $this->postParamMap = $postParamMap;
         $this->otherParamMap = $otherParamMap;
-        $this->allParam = array_merge($getParamMap, $postParamMap, $otherParamMap);
+        $this->allParam = array_merge($getParamMap, $postParamMap, $otherParamMap,$uploadFiles);
     }
 
     /**
