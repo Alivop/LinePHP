@@ -77,21 +77,20 @@ class Request extends \Request
     /**
      * 2015-09-08 添加获取其他请求方式的参数
      * 2015-09-09 $name为null时返回所有的请求参数
+     * 2015-10-16 简化获取参数值
      * @param string $name
      * @return null|string 
      */
     public function parameter($name=null)
     {
-        if(is_null($name)) return $this->allParam;
-        $var = $this->inputGet($name);
-        if (!is_null($var)) {
-            return $var;
+        if(is_null($name)) {
+            return $this->allParam;
+        }else{
+            if(isset($this->allParam[$name])){
+                return $this->allParam[$name];
+            }
         }
-        $var = $this->inputPost($name);
-        if(!is_null($var)){
-            return $var;
-        }
-        return $this->inputOther($name);
+        return null;
     }
 
     /**
@@ -149,6 +148,7 @@ class Request extends \Request
 
     /**
      * 2014-05-14 GET/POST参数统一使用MAP获取
+     * 2015-10-16 更改参数获取方式
      * @param string $name
      * @param int $type
      * @return null|string
@@ -158,19 +158,16 @@ class Request extends \Request
         if (!isset($name))
             return null;
         if ($type == 0) {
-            if ($this->getParamMap instanceof Map) {
-                $val = $this->getParamMap->get($name);
-                return $val;
+            if (isset($this->getParamMap[$name])) {
+                return $this->getParamMap[$name];
             }
         } else if($type == 1) {
-            if ($this->postParamMap instanceof Map) {
-                $val = $this->postParamMap->get($name);
-                return $val;
+            if (isset($this->postParamMap[$name])) {
+                return $this->postParamMap[$name];
             }
         }else{
-            if ($this->otherParamMap instanceof Map) {
-                $val = $this->otherParamMap->get($name);
-                return $val;
+            if (isset($this->otherParamMap[$name])) {
+                return $this->otherParamMap[$name];
             }
         }
         return null;
