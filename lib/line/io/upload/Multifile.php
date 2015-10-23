@@ -22,9 +22,6 @@
  */
 namespace line\io\upload;
 
-use line\core\util\Collection;
-use line\core\util\ArrayList;
-
 /**
  * 
  * @class Multifile
@@ -38,10 +35,10 @@ class Multifile extends \FileArray
     private $list;
     private $count;
 
-    public function __construct(Collection $list = null)
+    public function __construct( $list = null)
     {
-        $this->list = $list? : new ArrayList;
-        $this->count = $this->list->size();
+        $this->list = $list? : array();
+        $this->count = count($this->list);
     }
 
     public function count()
@@ -52,14 +49,19 @@ class Multifile extends \FileArray
     public function file($index)
     {
         if (is_int($index) && $index < $this->count) {
-            return $this->list->get($index);
+            return $this->list[$index];
         }
         return null;
     }
 
     public function iterator()
     {
-        return $this->list->iterator();
+        $file = each($this->list);
+        if($file){
+            return $file['value'];
+        }else{
+            return FALSE;
+        }
     }
 
 }
