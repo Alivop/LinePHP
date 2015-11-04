@@ -22,8 +22,6 @@
  */
 namespace line\core\request;
 
-use line\core\util\Map;
-
 /**
  * 
  * @class Request
@@ -132,9 +130,9 @@ class Request extends \Request
 
     public function getUploadFile($name)
     {
-        //if (isset($name))
-        return $this->uploadFiles->get($name);
-        //return null;
+        if (isset($this->uploadFiles[$name]))
+            return $this->uploadFiles[$name];
+        return null;
     }
     
     /**
