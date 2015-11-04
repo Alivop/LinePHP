@@ -37,7 +37,7 @@ class Multifile extends \FileArray
 
     public function __construct( $list = null)
     {
-        $this->list = $list? : array();
+        $this->list = $list?$list : array();
         $this->count = count($this->list);
     }
 

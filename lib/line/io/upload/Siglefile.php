@@ -37,14 +37,14 @@ class Siglefile extends \UploadFile
     private $upload;
     private $errorMessage;
 
-    public function __construct(array $upload = [])
+    public function __construct(array $upload = array())
     {
         $this->upload = $upload? : array('name' => '', 'size' => 0, 'type' => '', 'tmp_name' => '',
             'error' => null);
-        $this->errorMessage = [Config::$LP_LANG['upload_err_ok'], Config::$LP_LANG['upload_err_ini_size']
+        $this->errorMessage = array(Config::$LP_LANG['upload_err_ok'], Config::$LP_LANG['upload_err_ini_size']
             , Config::$LP_LANG['upload_err_form_size'], Config::$LP_LANG['upload_err_partial']
             , Config::$LP_LANG['upload_err_no_file'], Config::$LP_LANG['upload_err_no_tmp_dir']
-            , Config::$LP_LANG['upload_err_cant_write']];
+            , Config::$LP_LANG['upload_err_cant_write']);
     }
 
     public function name()
