@@ -65,13 +65,11 @@ class Config extends ConfigConst
                 case E_USER_NOTICE :
                 case E_DEPRECATED :
                 case E_USER_DEPRECATED :
-                    $msg = "<span style='font-weight:bold'>WARNING:</span><span style='color:#CD0000'>[" . $errfile .
-                            "(line:$errline)]</span>" . $errstr;
+                    $msg = "[WARNING][" . $errfile ."(line:$errline)]" . $errstr;
                     $logger->log(Level::SYSTEM, $msg);
                     break;
                 default :
-                    $msg = "<span style='font-weight:bold'>ERROR   :</span><span style='color:#CD0000;font-weight:bold'>[" . $errfile
-                            . "(line:$errline)]" . $errstr . "</span>";
+                    $msg = "[ERROR][" . $errfile. "(line:$errline)]" . $errstr ;
                     $logger->log(Level::SYSTEM, $msg);
                     exit();
             }
