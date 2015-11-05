@@ -76,7 +76,7 @@ abstract class LineLogger
     private function write($type, $level, $message)
     {
         $layout = Config::$LP_LOG['layout'];
-        $message = "<b>[{$type}]" . date($layout)."</b>" . $message;
+        $message = "<b>[{$type}]" . date($layout)."</b>[".$_SERVER['REQUEST_METHOD'].":".$_SERVER['REQUEST_URI']."]" . $message;
         $message = $this->deal($message);
         switch ($level) {
             case Level::FATAL :
