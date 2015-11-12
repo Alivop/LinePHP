@@ -225,8 +225,9 @@ class Controller extends BaseMVC
         if ($data === false) {
             return $this->callAction($controller);
         } else if ($data === true) {
-            if (!$this->oneParamter)
-                $this->parameterMap->remove(0);
+            var_dump($this->oneParamter);
+            //if (!$this->oneParamter)
+            //    $this->parameterMap->remove(0);
             return $this->callAction($controller, $mixed);
         }
     }
@@ -245,13 +246,13 @@ class Controller extends BaseMVC
         foreach ($methodParams as $methodParam) {
             $class = $methodParam->getClass();
             if ($methodParam->isArray()) {
-                $array = array();
+                /*$array = array();
                 while ($entry = $this->parameterMap->entry()) {
                     $key = $entry->key;
                     //if(strcasecmp($key,$this->oneParamter)==0) $key = 0;
                     $array[$key] = $entry->value;
-                }
-                $value = $array;
+                }*/
+                $value = $this->request->parameter();
             } else if (isset($class) && strcasecmp($class->getName(), 'Request') == 0) {
                 $value = $this->request;
             } else if (isset($class) && strcasecmp($class->getName(), 'UploadFile') == 0) {
