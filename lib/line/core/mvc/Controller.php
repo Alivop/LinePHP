@@ -225,7 +225,6 @@ class Controller extends BaseMVC
         if ($data === false) {
             return $this->callAction($controller);
         } else if ($data === true) {
-            var_dump($this->oneParamter);
             //if (!$this->oneParamter)
             //    $this->parameterMap->remove(0);
             return $this->callAction($controller, $mixed);
