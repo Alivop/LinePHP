@@ -66,7 +66,7 @@ class Controller extends BaseMVC
         $this->classSuffix = Config::$LP_SYS[Config::SYS_CLASS_SUFFIX];
         $this->methodPrefix = Config::$LP_SYS[Config::SYS_METHOD_PREFIX];
         $this->methodSuffix = Config::$LP_SYS[Config::SYS_METHOD_SUFFIX];
-        $this->parameterMap = new Map();
+        $this->parameterMap = $request->parameter();
         $this->oneParamter = false;
         //spl_autoload_unregister('line\core\Config::autoLoadClass');
         spl_autoload_register(array($this, 'autoLoadControllerClass'), true, true);
@@ -225,8 +225,8 @@ class Controller extends BaseMVC
         if ($data === false) {
             return $this->callAction($controller);
         } else if ($data === true) {
-            //if (!$this->oneParamter)
-            //    $this->parameterMap->remove(0);
+            if (!$this->oneParamter)
+                unset($this->parameterMap[0]);
             return $this->callAction($controller, $mixed);
         }
     }
@@ -251,7 +251,7 @@ class Controller extends BaseMVC
                     //if(strcasecmp($key,$this->oneParamter)==0) $key = 0;
                     $array[$key] = $entry->value;
                 }*/
-                $value = $this->request->parameter();
+                $value = $this->parameterMap;
             } else if (isset($class) && strcasecmp($class->getName(), 'Request') == 0) {
                 $value = $this->request;
             } else if (isset($class) && strcasecmp($class->getName(), 'UploadFile') == 0) {
@@ -273,9 +273,9 @@ class Controller extends BaseMVC
 //            } else if ($this->parameterMap->size() == 0) {
                 //$methodParamValues[] = null;
             } else {//2015-09-08 更改获取参数的方式
-                $value = $this->request->parameter($methodParam->getName());
+                $value = $this->parameterMap[$methodParam->getName()];
                 if (!isset($value)) {
-                        $value = $this->request->parameter($i);
+                        $value = $this->parameterMap[$i];
                         //$this->parameterMap->remove(0);
                         $i++;
                 }
@@ -332,26 +332,4 @@ class Controller extends BaseMVC
             throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ':' . $name);
         }
     }
-
-    /**
-     * @deprecated since 1.3
-     */
-    private function getParameters()
-    {
-        $keys = array_keys($_POST);
-        for ($i = 0; $i < count($keys); $i++) {
-            $key = $keys[$i];
-            $value = $this->request->post($key);
-            //if (isset($value))//2014-04-12
-            $this->parameterMap->set($key, $value);
-        }
-        $keys = array_keys($_GET);
-        for ($i = 0; $i < count($keys); $i++) {
-            $key = $keys[$i];
-            $value = $this->request->get($key);
-            //if (isset($value))//2014-04-12
-            $this->parameterMap->set($key, $value);
-        }
-    }
-
 }
