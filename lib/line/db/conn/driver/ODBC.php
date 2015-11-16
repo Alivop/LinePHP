@@ -106,6 +106,7 @@ class ODBC extends BaseConn implements DB
         if (odbc_error()) {
             return odbc_errormsg();
         }
+        return null;
     }
 
     public function rollback()
