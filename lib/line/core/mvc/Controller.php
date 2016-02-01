@@ -26,7 +26,6 @@ use line\core\request\Request;
 use line\core\Config;
 use line\core\exception\InvalidRequestException;
 use line\core\exception\IllegalAccessException;
-use line\core\util\Map;
 use line\io\upload\Siglefile;
 use line\io\upload\Multifile;
 use line\core\mvc\View;
@@ -273,9 +272,15 @@ class Controller extends BaseMVC
 //            } else if ($this->parameterMap->size() == 0) {
                 //$methodParamValues[] = null;
             } else {//2015-09-08 更改获取参数的方式
-                $value = $this->parameterMap[$methodParam->getName()];
+                if(isset($this->parameterMap[$methodParam->getName()])){
+                    $value = $this->parameterMap[$methodParam->getName()];
+                }
                 if (!isset($value)) {
-                        $value = $this->parameterMap[$i];
+                        if(isset($this->parameterMap[$i])){
+                            $value = $this->parameterMap[$i];
+                        }else{
+                            $value = null;
+                        }
                         //$this->parameterMap->remove(0);
                         $i++;
                 }
