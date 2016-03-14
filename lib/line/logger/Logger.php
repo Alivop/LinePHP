@@ -34,9 +34,6 @@ use line\core\Config;
  */
 final class Logger
 {
-    /** @var Logger $logger  The singleton object of Logger */
-    private static $logger;
-
     private function __construct()
     {
         
@@ -47,20 +44,21 @@ final class Logger
         
     }
 
-    public static function getInstance()
+    public static function getInstance($file=NULL)
     {
-        if (!isset(self::$logger)) {
             $class = '\\line\\logger\\' . Config::$LP_LOG[Config::LOG_APPENDER];
             if (class_exists($class)) {
                 if (strcasecmp(Config::$LP_LOG[Config::LOG_APPENDER], Config::LOG_APPENDER_CONSOLE) == 0) {
                     header("content-type:text/html;charset=".Config::$LP_SYS[Config::SYS_ENCODE]);
                 }
-                self::$logger = new $class;
+                $logger = new $class;
+                if(get_class($logger)==='line\logger\FileAppender'&&isset($file)){ //custom log file
+                    $logger->setFile($file);
+                }
             } else {
-                self::$logger = new self;
+                $logger = new self;
             }
-        }
-        return self::$logger;
+        return $logger;
     }
 
     final public function debug($message)

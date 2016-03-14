@@ -43,6 +43,10 @@ class FileAppender extends LineLogger
     {
         $this->file = Config::$LP_LOG['file'];
     }
+    
+    public function setFile($file){
+        $this->file = $file;
+    }
 
     protected function deal($message)
     {
