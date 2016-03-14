@@ -151,4 +151,7 @@ class Mysql extends BaseConn implements DB
         return $this->conn->insert_id;
     }
 
+    public function affectedRows(){
+        return $this->conn->affected_rows;
+    }
 }
