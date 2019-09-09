@@ -24,7 +24,6 @@ namespace line\core\request;
 
 use line\core\LinePHP;
 use line\core\filter\Filter;
-use line\core\util\Map;
 use line\core\mvc\Router;
 
 /**

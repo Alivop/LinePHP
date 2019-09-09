@@ -15,7 +15,8 @@ define('LP_CORE_LINE', LP_CORE_PATH . 'linephp' . LP_DS);
 define('LP_CORE_ABSTRACT', LP_CORE_PATH . 'abstract' . LP_DS);
 define('LP_IO_LINE', LP_IO_PATH . 'linephp' . LP_DS);
 define('LP_DB_LINE', LP_DB_PATH . 'linephp' . LP_DS);
-
+define('LP_EXTRA_PATH', LP_PATH . 'extra'. LP_DS);
+define('LP_RPC_LIB_PATH', LP_EXTRA_PATH . 'rpc' . LP_DS);
 //system error code
 define('ERROR_500', 500);
 define('ERROR_400', 400);

@@ -24,6 +24,7 @@ namespace line\core\mvc;
 
 use line\core\util\Map;
 use line\core\LinePHP;
+use function PHPSTORM_META\type;
 
 /**
  * 
@@ -42,11 +43,10 @@ class Data extends LinePHP
         $this->dataMap = new Map();
     }
 
-    public function setVariable($name, $value)
-    {
-        if (isset($name)) {
+    public function set($name, $value) {
+        if (is_string($name) && isset($value)) {
             $this->dataMap->set($name, $value);
         }
+        return $this;
     }
-
 }

@@ -35,23 +35,12 @@ use line\core\LinePHP;
  */
 class Entry extends LinePHP
 {
-    private $key;
-    private $value;
+    public $key;
+    public $value;
 
     public function __construct($key, $value)
     {
         $this->key = $key;
         $this->value = $value;
     }
-
-    public function __get($name)
-    {
-        return $this->$name;
-    }
-
-    public function __set($name, $value)
-    {
-        $this->$name = $value;
-    }
-
 }

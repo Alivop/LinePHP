@@ -157,7 +157,7 @@ class Response extends LinePHP
                     $tp = new Template($content, null, $pageFile);
                 }
                 header("Content-type: text/html; charset= $this->charset");
-                echo htmlspecialchars_decode($tp->parse());
+                echo ($tp->parse());
                 ob_end_flush();
             } else {
                 throw new FileNotFoundException(StringUtil::systemFormat(Config::$LP_LANG['file_not_exist'], $pageFile));

@@ -64,20 +64,23 @@ abstract class LineLogger
         $this->log(Level::SYSTEM, $message);
     }
 
-    final public function log($type, $message)
+    final public function log($type, $message, $file = '')
     {
         $level = Level::intValue(Config::$LP_LOG['level']);
         if ($level == Level::OFF) return;
         if ($type <= $level) {
-            $this->write(Level::stringValue($type), $type, $message);
+            $this->write(Level::stringValue($type), $type, $message, $file);
         }
     }
 
-    private function write($type, $level, $message)
+    private function write($type, $level, $message, $file = '')
     {
         $layout = Config::$LP_LOG['layout'];
-        $message = "<b>[{$type}]" . date($layout)."</b>[".$_SERVER['REQUEST_METHOD'].":".$_SERVER['REQUEST_URI']."]" . $message;
-        $message = $this->deal($message);
+        $head = "<b>[{$type}]" . date($layout)."</b>";
+        if (!empty($file)) {
+            $head .= "[$file]";
+        }
+        $message = $this->deal($head.$message);
         switch ($level) {
             case Level::FATAL :
                 $this->rewriteFatal($message);

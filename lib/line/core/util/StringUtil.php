@@ -20,6 +20,7 @@
  * limitations under the License.
  * ==========================================================================
  */
+
 namespace line\core\util;
 
 use line\core\LinePHP;
@@ -38,7 +39,7 @@ class StringUtil extends LinePHP
      * LinePHP use this format.Replace more than one '{}' in your string.
      * @param string $string subject string
      * @param string $replace the replaced string
-     * @return string 
+     * @return string
      */
     public static function systemFormat($string, $replace)
     {
@@ -75,14 +76,17 @@ class StringUtil extends LinePHP
      * 2014-04-10 更新W匹配-
      * 2014-04-11 更正中文匹配
      * 2014-04-15 更新可以自定义正则匹配
-     * @param type $type
-     * @param type $string
+     * @param string $type
+     * @param string $string
      * @param int $min
      * @param string $max
      * @return boolean
      */
     public static function validator($type, $string, $min = 0, $max = 0)
     {
+        if (!isset($string)) {
+            return false;
+        }
         if (empty($min))
             $min = 1;
         if (empty($max))
@@ -125,6 +129,11 @@ class StringUtil extends LinePHP
                 if (strcmp($match, $string) === 0)
                     return true;
                 return false;
+            case 'URL':
+                $match = filter_var($string, FILTER_VALIDATE_URL);
+                if (strcmp($match, $string) === 0)
+                    return true;
+                return false;
             default :
                 $reg = $type;
         }
@@ -136,4 +145,51 @@ class StringUtil extends LinePHP
         return false;
     }
 
+    public static function toCamelCase($str)
+    {
+        return preg_replace_callback('/[-_]+([a-z]{1})/i', function ($matches) {
+            return strtoupper($matches[1]);
+        }, $str);
+    }
+
+    public static function toUnderscoreCase($str)
+    {
+        $str = lcfirst($str);
+        return preg_replace_callback('/[A-Z]{1}/', function ($matches) {
+            return '_' . strtolower($matches[0]);
+        }, $str);
+    }
+
+    public static function startsWith($prefix, $str)
+    {
+        return strpos($str, $prefix) === 0;
+    }
+
+    public static function random($len = 6)
+    {
+        $source = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
+        return substr(str_shuffle($source), mt_rand(0, strlen($source) - $len - 1), $len);
+    }
+
+    public static function uuid() {
+        return sprintf('%04x%04x%04x%04x%04x%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+    }
+
+    public static function isAnyBlank() {
+        $args = func_get_args();
+        $blank = empty($args);
+        foreach($args as $arg) {
+            if (empty($arg)) {
+                $blank = true;
+                break;
+            }
+        }
+        return $blank;
+    }
 }

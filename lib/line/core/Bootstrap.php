@@ -44,7 +44,7 @@ class Bootstrap
         } catch (\Exception $e) {
             $message = $e->getMessage();
             $logger = line\logger\Logger::getInstance();
-            $logger->log(line\logger\Level::ERROR, $message);
+            $logger->log(line\logger\Level::ERROR, $message, $e->getFile().':'.$e->getLine());
             exit();
         }
     }

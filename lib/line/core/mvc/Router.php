@@ -67,7 +67,7 @@ class Router extends BaseMVC
 
     private function initUserLine()
     {
-        self::$LINE_CORE = array('View', 'Page', 'Data', 'Arraylist', 'Set', 'Map', 'Request', 'StringUtil');
+        self::$LINE_CORE = array('View', 'Page', 'Data', 'Arraylist', 'Set', 'Map', 'Request', 'StringUtil', 'JSON');
         self::$LINE_IO = array('File');
         self::$LINE_DB = array('DbFactory', 'Result', 'Statement');
     }

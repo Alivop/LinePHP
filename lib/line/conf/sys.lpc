@@ -55,7 +55,7 @@
 ;= 路径配置 =
 ;============
 ;路径是相对于网站根目录的.
-;属性说明:app配置application目录,page配置page目录.
+;属性说明:app配置功能类目录,page配置模板目录
 ;------------
 ;app = application
 ;page = page
@@ -96,11 +96,19 @@ driver=Mysqli
 type=mysql
 host=localhost
 port=3306
-name=llp_line_php
+name=root
 user=root
 password=root
 charset=utf8
 ;dsn = "{Microsoft Access Driver (*.mdb)};Dbq=/db.mdb"
+;--------------
+
+[RPC]
+;==============
+;=远程RPC配置 =
+;==============
+;RPC库，指定使用的rpc库，目前仅支持thrift
+lib=thrift
 ;
-;
-;
+;调用类目录，指定RPC服务类的相对目录，以本框架根目录开始
+path=cc

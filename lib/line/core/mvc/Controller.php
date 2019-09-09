@@ -28,7 +28,6 @@ use line\core\exception\InvalidRequestException;
 use line\core\exception\IllegalAccessException;
 use line\io\upload\Siglefile;
 use line\io\upload\Multifile;
-use line\core\mvc\View;
 /**
  * 控制器。
  * @class Controller
@@ -42,6 +41,7 @@ class Controller extends BaseMVC
     //const PATH = 'controller';
     const INDEX = 'Index';
     const METHOD = 'main';
+    private static $RPC_LIB = array("Thrift");
 
     private $request;
     private $application;
@@ -269,7 +269,7 @@ class Controller extends BaseMVC
                     if (!$value instanceof Multifile)
                         $value = new Multifile();
                 }
-//            } else if ($this->parameterMap->size() == 0) {
+            //} else if (isset($class) && is_object($class)) {
                 //$methodParamValues[] = null;
             } else {//2015-09-08 更改获取参数的方式
                 if(isset($this->parameterMap[$methodParam->getName()])){
@@ -300,10 +300,13 @@ class Controller extends BaseMVC
     private function autoLoadControllerClass($class)
     {
         $class = str_replace("\\","/",$class);
+        if ($this->loadExtraClass($class)) {
+            return;
+        }
         $sourceLib = LP_LIBRARY_PATH . "{$class}.php";
         $sourceApp = $this->application . "{$class}.php";
-        $sourceLibCase = LP_LIBRARY_PATH . strtolower("{$class}.php");
-        $sourceAppCase = $this->application . strtolower("{$class}.php");
+        $sourceLibCase = LP_LIBRARY_PATH . ucfirst("{$class}.php");
+        $sourceAppCase = $this->application . ucfirst("{$class}.php");
         if (is_file($sourceLib)) {
             require_once($sourceLib);
         } else if (is_file($sourceApp)) {
@@ -336,5 +339,30 @@ class Controller extends BaseMVC
         } else {
             throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ':' . $name);
         }
+    }
+
+    private function loadExtraClass($class) {
+        if (!empty(Config::$LP_RPC[Config::RPC_PATH])
+            && strpos($class, Config::$LP_RPC[Config::RPC_PATH]) === 0) {
+            $file = LP_ROOT.LP_DS.$class.'.php';
+            if (is_file($file)) {
+                require_once($file);
+                return true;
+            } else {
+                throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ':' . $class);
+            }
+        }
+
+        $firstDir = strstr($class, '/', true);
+        if (in_array($firstDir, self::$RPC_LIB)) {
+            $file = LP_RPC_LIB_PATH. Config::$LP_RPC[Config::RPC_LIB] .$class . '.php';
+            if (is_file($file)) {
+                require_once ($file);
+                return true;
+            } else {
+                throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ':' . $class);
+            }
+        }
+        return false;
     }
 }

@@ -22,11 +22,12 @@
  */
 namespace line\core\mvc;
 
+use line\core\util\JSON;
 use line\core\util\Map;
 use line\core\exception\FileNotFoundException;
 
 /**
- * 
+ *
  * @class View
  * @link  http://linephp.com
  * @author Alivop[alivop.liu@gmail.com]
@@ -74,6 +75,11 @@ class View extends Page
         } else {
             throw new FileNotFoundException(str_replace('{}', '', Config::$LP_LANG['file_not_exist'] . ':' . $url));
         }
+    }
+
+    public function toJSON(array $ignoreVars = null)
+    {
+        return JSON::stringify($this->dataMap, $ignoreVars);
     }
 
 }

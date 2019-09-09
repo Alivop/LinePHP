@@ -60,4 +60,6 @@ interface DB
     function beginTransaction();
 
     function query($sql);
+
+    function setDomain($domain);
 }

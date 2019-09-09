@@ -46,6 +46,7 @@ class Config extends ConfigConst
     public static $LP_SYS = array();         //system
     public static $LP_LANG = array();        //interior language
     public static $LP_DB = array();
+    public static $LP_RPC = array();
 
     /**
      * 2014-04-11 session opened for default
@@ -65,12 +66,12 @@ class Config extends ConfigConst
                 case E_USER_NOTICE :
                 case E_DEPRECATED :
                 case E_USER_DEPRECATED :
-                    $msg = "[WARNING][" . $errfile ."(line:$errline)]" . $errstr;
-                    $logger->log(Level::SYSTEM, $msg);
+                    $msg = "[WARNING]" . $errstr;
+                    $logger->log(Level::SYSTEM, $msg, $errfile . ':' . $errline);
                     break;
                 default :
-                    $msg = "[ERROR][" . $errfile. "(line:$errline)]" . $errstr ;
-                    $logger->log(Level::SYSTEM, $msg);
+                    $msg = "[ERROR]" . $errstr;
+                    $logger->log(Level::SYSTEM, $msg, $errfile . ':' . $errline);
                     exit();
             }
         });
@@ -78,7 +79,7 @@ class Config extends ConfigConst
         spl_autoload_register('line\core\Config::autoLoadClass', true, true);
         self::loadSystemLanguage();
         //self::console(Level::INFO, self::$LP_LANG['framework_init']);
-        $configKeys = array('Sys', 'Path', 'Log', 'Database');
+        $configKeys = array('Sys', 'Path', 'Log', 'Database', 'RPC');
         $file = LP_CONF_PATH . 'sys.lpc';
         if (file_exists($file)) {
             $config = parse_ini_file($file, true);
@@ -91,16 +92,22 @@ class Config extends ConfigConst
                     }
                 }
             } else {
-                call_user_func(array('self', 'init' . $key));
+                self::defaultInit();
             }
         } else {
-            self::initSys();
-            self::initPath();
-            self::initLog();
-            self::initDB();
+            self::defaultInit();
             $error = StringUtil::systemFormat(self::$LP_LANG['config_not_found'], $file);
             self::console(Level::WARN, $error);
         }
+    }
+
+    private static function defaultInit()
+    {
+        self::initSys();
+        self::initPath();
+        self::initLog();
+        self::initDatabase();
+        self::initRPC();
     }
 
     private static function initSys($config = null)
@@ -121,17 +128,12 @@ class Config extends ConfigConst
             return;
         $keys = array_keys(self::$LP_SYS);
         //custom
-        $isError = false;
         foreach ($keys as $key) {
             if (array_key_exists($key, $config)) {
                 $custom = $config[$key];
                 if ($custom) {
                     self::$LP_SYS[$key] = $custom;
-                } else {
-                    $isError = true;
                 }
-            } else {
-                $isError = true;
             }
         }
         if (strcasecmp(self::$LP_SYS[self::SYS_MODE], self::SYS_MODE_DEVELOPMENT) == 0) {
@@ -154,21 +156,21 @@ class Config extends ConfigConst
         );
         if (!is_array($config))
             return;
-        $keys = array_keys(self::$LP_PATH);
         //custom
-        $isError = false;
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $config)) {
-                $custom = realpath($config[$key]);
-                if ($custom) {
-                    self::$LP_PATH[$key] = $custom;
-                } else {
-                    $isError = true;
-                }
-            } else {
-                $isError = true;
+        if (array_key_exists(self::PATH_APP, $config) && isset($config[self::PATH_APP])) {
+            $custom = realpath($config[self::PATH_APP]);
+            if ($custom) {
+                self::$LP_PATH[self::PATH_APP] = $custom;
             }
         }
+
+        if (array_key_exists(self::PATH_PAGE, $config) && isset($config[self::PATH_PAGE])) {
+            $custom = realpath($config[self::PATH_PAGE]);
+            if ($custom) {
+                self::$LP_PATH[self::PATH_PAGE] = $custom;
+            }
+        }
+
     }
 
     private static function initLog($config = null)
@@ -176,25 +178,20 @@ class Config extends ConfigConst
         //default
         self::$LP_LOG[self::LOG_LEVEL] = self::LOG_LEVEL_DEBUG;
         self::$LP_LOG[self::LOG_LAYOUT] = self::LOG_LAYOUT_DEFAULT;
-        self::$LP_LOG[self::LOG_FILE] = self::LOG_FILE_DEFAULE;
-        self::$LP_LOG[self::LOG_FIEL_PATTERN] = self::LOG_FIEL_PATTERN_DEFAULT;
+        self::$LP_LOG[self::LOG_FILE] = self::LOG_FILE_DEFAULT;
+        self::$LP_LOG[self::LOG_FILE_PATTERN] = self::LOG_FILE_PATTERN_DEFAULT;
         //self::LOG_LOGGER => self::LOG_LOGGER_OFF,
         //self::LOG_APPENDER => self::LOG_APPENDER_FILE,
         if (!is_array($config))
             return;
         $keys = array_keys(self::$LP_LOG);
         //custom
-        $isError = false;
         foreach ($keys as $key) {
             if (array_key_exists($key, $config)) {
                 $custom = $config[$key];
                 if ($custom) {
                     self::$LP_LOG[$key] = $custom;
-                } else {
-                    $isError = true;
                 }
-            } else {
-                $isError = true;
             }
         }
         if (strcasecmp(self::$LP_SYS[self::SYS_MODE], self::SYS_MODE_PRODUCTION) === 0) {
@@ -239,6 +236,25 @@ class Config extends ConfigConst
         }
     }
 
+    private static function initRPC($config = null)
+    {
+        self::$LP_RPC = array(
+            self::RPC_LIB => '',
+            self::RPC_PATH => ''
+        );
+        if (!is_array($config))
+            return;
+        if (array_key_exists(self::RPC_LIB, $config) && isset($config[self::RPC_LIB])) {
+            self::$LP_RPC[self::RPC_LIB] = $config[self::RPC_LIB] . LP_DS;
+        }
+
+        if (array_key_exists(self::RPC_PATH, $config) && isset($config[self::RPC_PATH])) {
+            $path = str_replace(array('/', '\\'), '', $config[self::RPC_PATH]);
+            $path .= '/';
+            self::$LP_RPC[self::RPC_PATH] = $path;
+        }
+    }
+
     private static function loadSystemLanguage()
     {
         $local = 'ZH';
@@ -256,7 +272,6 @@ class Config extends ConfigConst
 
     private static function autoLoadClass($class)
     {
-
         if (strpos($class, '\\') === false) {
             $source = LP_CORE_ABSTRACT . "{$class}.php";
         } else {
@@ -266,9 +281,6 @@ class Config extends ConfigConst
         if (is_file($source)) {
             require_once($source);
         } else {
-            //echo $source;
-            $message = StringUtil::systemFormat(self::$LP_LANG['file_not_exist'], $source);
-            self::Level(self::ERROR, $message);
             throw new InvalidRequestException(Config::$LP_LANG['bad_request'] . ":{$class}", ERROR_400);
         }
     }

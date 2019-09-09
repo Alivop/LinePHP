@@ -62,6 +62,7 @@ class Template extends LinePHP
             //$content = $this->parseExpression($content, $this->description, $this->data);
             $content = $this->includeContent($content);
             $content = $this->parseNode($content);
+            $content = html_entity_decode($content);
             $content = $this->parseComment($content);
             $content = $this->parseNote($content);
         }
@@ -195,6 +196,10 @@ class Template extends LinePHP
         } else {
             $content = str_replace(array("&"), array("&amp;"), $content);
             $dom = new \DOMDocument();
+            $dom->encoding = 'UTF-8';
+            $dom->strictErrorChecking = false;
+            $dom->xmlStandalone = true;
+            $dom->resolveExternals = true;
             $dom->loadXML($content);
             if ($this->parseLayout($dom, $content)) {
                 return $this->parseNode($content);

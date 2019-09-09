@@ -33,7 +33,49 @@ namespace line\db\conn;
 abstract class BaseConn extends \line\core\LinePHP
 {
     protected $conn;
+    protected $domain;
+    protected $anonymous;
 
-    //protected $connect_error;
-    //protected $query_error;
+    function setDomain($domain)
+    {
+        if (!isset($domain)) {
+            return;
+        }
+        $this->domain = $domain;
+        $this->anonymous = 'LpAnonymousClass'.mt_rand();
+        $tmp = <<<EOF
+class $this->anonymous extends $domain {
+    public function __set(\$name, \$value)
+    {
+        \$name = preg_replace_callback('/[-_]+([a-z]{1})/i',function(\$matches){
+            return strtoupper(\$matches[1]);
+        }, \$name);
+        \$setMethod = 'set'.ucfirst(\$name);
+        if (method_exists(\$this, \$setMethod)) {
+            \$this->\$setMethod(\$value);
+        }
+    }
+    
+    public function __get(\$name)
+    {
+        \$n =  preg_replace_callback('/[-_]+([a-z]{1})/i',function(\$matches){
+            return strtoupper(\$matches[1]);
+        }, \$name);
+        \$getMethod = 'get'.ucfirst(\$name);
+        if (method_exists(\$this, \$getMethod)) {
+            return \$this->\$getMethod();
+        }
+        return null;
+    }
+}
+EOF;
+        eval($tmp);
+    }
+
+    abstract function close();
+
+    function __destruct() {
+        $this->close();
+    }
+
 }

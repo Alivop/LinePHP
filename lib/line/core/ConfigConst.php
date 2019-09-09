@@ -64,7 +64,7 @@ class ConfigConst extends LinePHP
     const LOG_APPENDER = 'appender';
     const LOG_LAYOUT = 'layout';
     const LOG_FILE = 'file';
-    const LOG_FIEL_PATTERN = 'file_pattern';
+    const LOG_FILE_PATTERN = 'file_pattern';
     const LOG_LOGGER_ON = 'ON';
     const LOG_LOGGER_OFF = 'OFF';
     const LOG_LEVEL_OFF = 'OFF';
@@ -75,8 +75,8 @@ class ConfigConst extends LinePHP
     const LOG_APPENDER_FILE = 'FileAppender';
     const LOG_APPENDER_CONSOLE = 'ConsoleAppender';
     const LOG_LAYOUT_DEFAULT = '[Y-m-d H:i:s,B]';
-    const LOG_FILE_DEFAULE = 'linephp.log';
-    const LOG_FIEL_PATTERN_DEFAULT = '.Y-m-d';
+    const LOG_FILE_DEFAULT = 'linephp.log';
+    const LOG_FILE_PATTERN_DEFAULT = '.Y-m-d';
     const DEBUG = 'DEBUG';
     const INFO = 'INFO';
     const WARN = 'WARN';
@@ -95,5 +95,8 @@ class ConfigConst extends LinePHP
     const DB_HOST_DEFAULT = '127.0.0.1';
     const DB_PORT_DEFAULT = '3306';
     const DB_DSN = 'dsn';
+    //RPC config
+    const RPC_LIB = 'lib';
+    const RPC_PATH = 'path';
     
 }

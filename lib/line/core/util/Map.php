@@ -264,9 +264,6 @@ class Map extends LinePHP
         return -1;
     }
 
-//    public function values() {
-//        
-//    }
 
     private function init()
     {
