@@ -130,7 +130,7 @@ class Mysql extends BaseConn implements DB
                         $rows[] = $row;
                     }
                 } else {
-                    $rows = $return->fetch_all(MYSQLI_ASSOC);
+                    $rows = $return->fetch_assoc();
                 }
                 $result = new MysqlResult($rows, $return->field_count, $return->num_rows, $return->fetch_fields());
                 $return->close();
